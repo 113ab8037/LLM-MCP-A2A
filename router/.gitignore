@@ -84,7 +84,6 @@ htmlcov/
 .mypy_cache/
 
 # Package files
-*.whl
 *.tar.gz
 *.zip
 
