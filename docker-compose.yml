@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mcp-weather:
+    build:
+      context: mcp-weather
+      dockerfile: Dockerfile
+    container_name: mcp-weather-server
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - UV_SYSTEM_PYTHON=1
+    restart: unless-stopped
+    volumes:
+      # Для разработки: синхронизация изменений кода
+      - ./mcp-weather/server.py:/app/server.py:ro
+      - ./mcp-weather/test:/app/test:ro
+      # Монтируем pyproject.toml для отслеживания изменений зависимостей
+      - ./mcp-weather/pyproject.toml:/app/pyproject.toml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/sse/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Ограничения ресурсов для стабильной работы
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+          
+  a2a-agent:
+    build:
+      context: agent
+      dockerfile: Dockerfile
+    container_name: a2a-agent
+    ports:
+      - "10002:10002"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - UV_SYSTEM_PYTHON=1
+      - MCP_URL=http://mcp-weather:8001/sse
+    restart: unless-stopped
+    volumes:
+      # Для разработки: синхронизация изменений кода
+      - ./agent/app:/app/app:ro
+      # Монтируем pyproject.toml для отслеживания изменений зависимостей
+      - ./agent/pyproject.toml:/app/pyproject.toml:ro
+      - ./agent/uv.lock:/app/uv.lock:ro
+      # Монтируем wheel файл
+      - ./agent/litellm-1.72.3-py3-none-any.whl:/app/litellm-1.72.3-py3-none-any.whl:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:10002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Ограничения ресурсов для стабильной работы
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'

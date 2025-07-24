@@ -1,0 +1,761 @@
+{
+  "info": {
+    "name": "A2A Protocol - Official Specification v0.2.2",
+    "description": "Comprehensive Postman collection for Agent2Agent (A2A) Protocol based on the official specification from Google\n\nA2A is an open standard designed to facilitate communication and interoperability between independent AI agent systems.\n\nFeatures:\n- Agent discovery via Agent Cards\n- Task management with lifecycle states\n- Multi-modal content exchange (text, files, structured data)\n- Streaming support via Server-Sent Events\n- Push notifications for long-running tasks\n- Enterprise-grade security\n\nBase URL: https://google-a2a.github.io/A2A/\nSpecification: https://google-a2a.github.io/A2A/latest/specification/",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Agent Discovery",
+      "description": "Discover agents and their capabilities via Agent Cards",
+      "item": [
+        {
+          "name": "Get Agent Card (Public)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/.well-known/agent.json",
+              "host": ["{{baseUrl}}"],
+              "path": [".well-known", "agent.json"]
+            },
+            "description": "Fetches the public Agent Card that describes the agent's identity, capabilities, skills, service endpoint, and authentication requirements.\n\nThe Agent Card is a JSON metadata document typically published at /.well-known/agent.json following RFC 8615 for well-known URIs."
+          },
+          "response": [
+            {
+              "name": "Agent Card Example",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/.well-known/agent.json",
+                  "host": ["{{baseUrl}}"],
+                  "path": [".well-known", "agent.json"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"name\": \"GeoSpatial Route Planner Agent\",\n  \"description\": \"Provides advanced route planning, traffic analysis, and custom map generation services. This agent can calculate optimal routes, estimate travel times considering real-time traffic, and create personalized maps with points of interest.\",\n  \"url\": \"https://georoute-agent.example.com/a2a/v1\",\n  \"provider\": {\n    \"organization\": \"Example Geo Services Inc.\",\n    \"url\": \"https://www.examplegeoservices.com\"\n  },\n  \"iconUrl\": \"https://georoute-agent.example.com/icon.png\",\n  \"version\": \"1.2.0\",\n  \"documentationUrl\": \"https://docs.examplegeoservices.com/georoute-agent/api\",\n  \"capabilities\": {\n    \"streaming\": true,\n    \"pushNotifications\": true,\n    \"stateTransitionHistory\": false\n  },\n  \"securitySchemes\": {\n    \"google\": {\n      \"type\": \"openIdConnect\",\n      \"openIdConnectUrl\": \"https://accounts.google.com/.well-known/openid-configuration\"\n    }\n  },\n  \"security\": [{\"google\": [\"openid\", \"profile\", \"email\"]}],\n  \"defaultInputModes\": [\"application/json\", \"text/plain\"],\n  \"defaultOutputModes\": [\"application/json\", \"image/png\"],\n  \"skills\": [\n    {\n      \"id\": \"route-optimizer-traffic\",\n      \"name\": \"Traffic-Aware Route Optimizer\",\n      \"description\": \"Calculates the optimal driving route between two or more locations, taking into account real-time traffic conditions, road closures, and user preferences (e.g., avoid tolls, prefer highways).\",\n      \"tags\": [\"maps\", \"routing\", \"navigation\", \"directions\", \"traffic\"],\n      \"examples\": [\n        \"Plan a route from '1600 Amphitheatre Parkway, Mountain View, CA' to 'San Francisco International Airport' avoiding tolls.\",\n        \"{\\\"origin\\\": {\\\"lat\\\": 37.422, \\\"lng\\\": -122.084}, \\\"destination\\\": {\\\"lat\\\": 37.7749, \\\"lng\\\": -122.4194}, \\\"preferences\\\": [\\\"avoid_ferries\\\"]}\"\n      ],\n      \"inputModes\": [\"application/json\", \"text/plain\"],\n      \"outputModes\": [\"application/json\", \"application/vnd.geo+json\", \"text/html\"]\n    }\n  ],\n  \"supportsAuthenticatedExtendedCard\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Authenticated Extended Agent Card",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "description": "Authentication token as required by agent's security schemes"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/agent/authenticatedExtendedCard",
+              "host": ["{{baseUrl}}"],
+              "path": ["agent", "authenticatedExtendedCard"]
+            },
+            "description": "Retrieves a potentially more detailed version of the Agent Card after authentication. Available only if AgentCard.supportsAuthenticatedExtendedCard is true.\n\nThis is an HTTP GET endpoint (not JSON-RPC) that may contain additional details or skills not present in the public card."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Message Operations",
+      "description": "Send messages and initiate tasks with agents",
+      "item": [
+        {
+          "name": "Send Message (Non-Streaming)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Привет! Расскажи мне короткую шутку.\"\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    },\n    \"configuration\": {\n      \"acceptedOutputModes\": [\"text/plain\", \"application/json\"],\n      \"historyLength\": 5,\n      \"blocking\": true\n    }\n  }\n}"
+            },
+            "description": "Sends a message to an agent to initiate a new interaction or continue an existing one. Suitable for synchronous request/response interactions or when client-side polling is acceptable."
+          },
+          "response": [
+            {
+              "name": "Task Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Tell me a joke\"\n        }\n      ],\n      \"messageId\": \"9229e770-767c-417b-a0b0-f0741243c589\",\n      \"kind\": \"message\"\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"result\": {\n    \"id\": \"363422be-b0f9-4692-a24d-278670e7c7f1\",\n    \"contextId\": \"c295ea44-7543-4f78-b524-7a38915ad6e4\",\n    \"status\": {\n      \"state\": \"completed\"\n    },\n    \"artifacts\": [\n      {\n        \"artifactId\": \"9b6934dd-37e3-4eb1-8766-962efaab63a1\",\n        \"name\": \"joke\",\n        \"parts\": [\n          {\n            \"kind\": \"text\",\n            \"text\": \"Why did the chicken cross the road? To get to the other side!\"\n          }\n        ]\n      }\n    ],\n    \"kind\": \"task\"\n  }\n}"
+            },
+            {
+              "name": "Direct Message Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Tell me a joke\"\n        }\n      ],\n      \"messageId\": \"9229e770-767c-417b-a0b0-f0741243c589\",\n      \"kind\": \"message\"\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"result\": {\n    \"messageId\": \"363422be-b0f9-4692-a24d-278670e7c7f1\",\n    \"contextId\": \"c295ea44-7543-4f78-b524-7a38915ad6e4\",\n    \"role\": \"agent\",\n    \"parts\": [\n      {\n        \"kind\": \"text\",\n        \"text\": \"Why did the chicken cross the road? To get to the other side!\"\n      }\n    ],\n    \"kind\": \"message\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Send Message with File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Проанализируй это изображение и выдели все лица.\"\n        },\n        {\n          \"kind\": \"file\",\n          \"file\": {\n            \"name\": \"input_image.png\",\n            \"mimeType\": \"image/png\",\n            \"bytes\": \"iVBORw0KGgoAAAANSUhEUgAAAAUA...\"\n          }\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    },\n    \"configuration\": {\n      \"acceptedOutputModes\": [\"image/png\", \"image/jpeg\", \"application/json\"]\n    }\n  }\n}"
+            },
+            "description": "Example of sending a message with a file attachment (image) for analysis. The file can be sent as base64-encoded bytes or as a URI reference."
+          },
+          "response": []
+        },
+        {
+          "name": "Send Message with Structured Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Покажи мои открытые IT тикеты\",\n          \"metadata\": {\n            \"mimeType\": \"application/json\",\n            \"schema\": {\n              \"type\": \"array\",\n              \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"ticketNumber\": {\"type\": \"string\"},\n                  \"description\": {\"type\": \"string\"}\n                }\n              }\n            }\n          }\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    },\n    \"configuration\": {\n      \"acceptedOutputModes\": [\"application/json\", \"text/plain\"]\n    }\n  }\n}"
+            },
+            "description": "Example of requesting structured data with schema hints. The agent should return data in the requested JSON format."
+          },
+          "response": []
+        },
+        {
+          "name": "Send Streaming Message (SSE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"message/stream\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Напиши длинную статью об искусственном интеллекте с описанием последних достижений.\"\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    },\n    \"configuration\": {\n      \"acceptedOutputModes\": [\"text/plain\", \"text/html\", \"application/json\"]\n    }\n  }\n}"
+            },
+            "description": "Sends a message and subscribes to real-time updates via Server-Sent Events (SSE). The response will be a stream of events with Content-Type: text/event-stream.\n\nRequires the server to have AgentCard.capabilities.streaming: true."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Task Management",
+      "description": "Manage task lifecycle and retrieve task information",
+      "item": [
+        {
+          "name": "Get Task Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/get\",\n  \"params\": {\n    \"id\": \"{{taskId}}\",\n    \"historyLength\": 10\n  }\n}"
+            },
+            "description": "Retrieves the current state of a previously initiated task, including status, artifacts, and optionally history. Used for polling task status after message/send or after SSE stream ends."
+          },
+          "response": [
+            {
+              "name": "Task Details",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tasks/get\",\n  \"params\": {\n    \"id\": \"task-123\",\n    \"historyLength\": 5\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"result\": {\n    \"id\": \"task-123\",\n    \"contextId\": \"context-456\",\n    \"status\": {\n      \"state\": \"completed\",\n      \"timestamp\": \"2024-03-15T10:30:00Z\"\n    },\n    \"artifacts\": [\n      {\n        \"artifactId\": \"artifact-789\",\n        \"name\": \"result\",\n        \"parts\": [\n          {\n            \"kind\": \"text\",\n            \"text\": \"Task completed successfully\"\n          }\n        ]\n      }\n    ],\n    \"history\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [\n          {\n            \"kind\": \"text\",\n            \"text\": \"Initial request\"\n          }\n        ],\n        \"messageId\": \"msg-1\",\n        \"taskId\": \"task-123\",\n        \"contextId\": \"context-456\",\n        \"kind\": \"message\"\n      }\n    ],\n    \"kind\": \"task\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/cancel\",\n  \"params\": {\n    \"id\": \"{{taskId}}\"\n  }\n}"
+            },
+            "description": "Requests the cancellation of an ongoing task. Success is not guaranteed - the task might have already completed, failed, or cancellation might not be supported at its current stage."
+          },
+          "response": []
+        },
+        {
+          "name": "Resubscribe to Task Stream",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/resubscribe\",\n  \"params\": {\n    \"id\": \"{{taskId}}\"\n  }\n}"
+            },
+            "description": "Allows a client to reconnect to an SSE stream for an ongoing task after a previous connection was interrupted. Resumes receiving subsequent updates.\n\nRequires the server to have AgentCard.capabilities.streaming: true."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Push Notifications",
+      "description": "Configure and manage push notifications for long-running tasks",
+      "item": [
+        {
+          "name": "Set Push Notification Config",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/pushNotificationConfig/set\",\n  \"params\": {\n    \"taskId\": \"{{taskId}}\",\n    \"pushNotificationConfig\": {\n      \"url\": \"https://client.example.com/webhook/a2a-notifications\",\n      \"token\": \"secure-client-token-for-task-{{taskId}}\",\n      \"authentication\": {\n        \"schemes\": [\"Bearer\"]\n      }\n    }\n  }\n}"
+            },
+            "description": "Sets or updates the push notification configuration for a specified task. Allows the client to tell the server where and how to send asynchronous updates.\n\nRequires the server to have AgentCard.capabilities.pushNotifications: true."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Push Notification Config",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/pushNotificationConfig/get\",\n  \"params\": {\n    \"id\": \"{{taskId}}\"\n  }\n}"
+            },
+            "description": "Retrieves the current push notification configuration for a specified task.\n\nRequires the server to have AgentCard.capabilities.pushNotifications: true."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Multi-Turn Interactions",
+      "description": "Examples of complex multi-turn conversations and workflows",
+      "item": [
+        {
+          "name": "Flight Booking - Initial Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"req-003\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Я хочу забронировать авиабилет.\"\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    }\n  }\n}"
+            },
+            "description": "Step 1: Initial request that will likely result in input-required state, as the agent needs more information to proceed."
+          },
+          "response": [
+            {
+              "name": "Input Required Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"req-003\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"I'd like to book a flight.\"\n        }\n      ],\n      \"messageId\": \"c53ba666-3f97-433c-a87b-6084276babe2\",\n      \"kind\": \"message\"\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"req-003\",\n  \"result\": {\n    \"id\": \"3f36680c-7f37-4a5f-945e-d78981fafd36\",\n    \"contextId\": \"c295ea44-7543-4f78-b524-7a38915ad6e4\",\n    \"status\": {\n      \"state\": \"input-required\",\n      \"message\": {\n        \"role\": \"agent\",\n        \"parts\": [\n          {\n            \"kind\": \"text\",\n            \"text\": \"Конечно, я могу помочь с этим! Куда вы хотите лететь и откуда? Также, какие у вас предпочтительные даты поездки?\"\n          }\n        ],\n        \"messageId\": \"c2e1b2dd-f200-4b04-bc22-1b0c65a1aad2\",\n        \"taskId\": \"3f36680c-7f37-4a5f-945e-d78981fafd36\",\n        \"contextId\": \"c295ea44-7543-4f78-b524-7a38915ad6e4\",\n        \"kind\": \"message\"\n      },\n      \"timestamp\": \"2024-03-15T10:10:00Z\"\n    },\n    \"kind\": \"task\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Flight Booking - Provide Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"req-004\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"text\",\n          \"text\": \"Я хочу лететь из Москвы (SVO) в Лондон (LHR) примерно 10 октября, возвращение 17 октября.\"\n        }\n      ],\n      \"contextId\": \"c295ea44-7543-4f78-b524-7a38915ad6e4\",\n      \"taskId\": \"3f36680c-7f37-4a5f-945e-d78981fafd36\",\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    },\n    \"configuration\": {\n      \"blocking\": true\n    }\n  }\n}"
+            },
+            "description": "Step 2: Providing the requested information to continue the same task. Note the same taskId and contextId are used to maintain conversation context."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Error Scenarios",
+      "description": "Test error handling and edge cases",
+      "item": [
+        {
+          "name": "Invalid Method",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"invalid/method\",\n  \"params\": {}\n}"
+            },
+            "description": "Tests error handling for unsupported JSON-RPC methods. Should return -32601 Method not found error."
+          },
+          "response": [
+            {
+              "name": "Method Not Found Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"invalid/method\",\n  \"params\": {}\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"error\": {\n    \"code\": -32601,\n    \"message\": \"Method not found\",\n    \"data\": \"The method 'invalid/method' is not supported by this agent\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Task Not Found",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"tasks/get\",\n  \"params\": {\n    \"id\": \"nonexistent-task-id\"\n  }\n}"
+            },
+            "description": "Tests error handling for non-existent task IDs. Should return -32001 TaskNotFoundError."
+          },
+          "response": [
+            {
+              "name": "Task Not Found Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tasks/get\",\n  \"params\": {\n    \"id\": \"nonexistent-task-id\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}",
+                  "host": ["{{baseUrl}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"error\": {\n    \"code\": -32001,\n    \"message\": \"Task not found\",\n    \"data\": \"The specified task id does not correspond to an existing or active task\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Unsupported Content Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": \"{{$randomUUID}}\",\n  \"method\": \"message/send\",\n  \"params\": {\n    \"message\": {\n      \"role\": \"user\",\n      \"parts\": [\n        {\n          \"kind\": \"file\",\n          \"file\": {\n            \"name\": \"unsupported.xyz\",\n            \"mimeType\": \"application/x-unsupported-format\",\n            \"bytes\": \"dGVzdCBkYXRh\"\n          }\n        }\n      ],\n      \"messageId\": \"{{$randomUUID}}\",\n      \"kind\": \"message\"\n    }\n  }\n}"
+            },
+            "description": "Tests error handling for unsupported content types. Should return -32005 ContentTypeNotSupportedError."
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid JSON-RPC Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": ["{{baseUrl}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jsonrpc\": \"1.0\",\n  \"method\": \"message/send\",\n  \"params\": {}\n}"
+            },
+            "description": "Tests error handling for invalid JSON-RPC requests (wrong version, missing required fields). Should return -32600 Invalid Request error."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:10004",
+      "description": "Base URL of the A2A agent server"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "description": "Authentication token (Bearer token, API key, etc.) as required by the agent's security scheme"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "description": "Task ID for testing task-specific operations. Set this manually or extract from previous responses."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Auto-generate UUIDs for message IDs",
+          "if (!pm.collectionVariables.get('messageId')) {",
+          "    pm.collectionVariables.set('messageId', pm.variables.replaceIn('{{$randomUUID}}'));",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "// Basic tests for all requests",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "// Extract taskId from successful responses",
+          "if (pm.response.code === 200) {",
+          "    try {",
+          "        const responseJson = pm.response.json();",
+          "        if (responseJson.result && responseJson.result.id) {",
+          "            pm.collectionVariables.set('taskId', responseJson.result.id);",
+          "            console.log('Extracted taskId:', responseJson.result.id);",
+          "        }",
+          "        if (responseJson.result && responseJson.result.taskId) {",
+          "            pm.collectionVariables.set('taskId', responseJson.result.taskId);",
+          "            console.log('Extracted taskId:', responseJson.result.taskId);",
+          "        }",
+          "    } catch (e) {",
+          "        console.log('Could not parse response as JSON or extract taskId');",
+          "    }",
+          "}",
+          "",
+          "// Validate JSON-RPC response structure",
+          "if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+          "    pm.test('Valid JSON-RPC 2.0 response', function () {",
+          "        const responseJson = pm.response.json();",
+          "        pm.expect(responseJson).to.have.property('jsonrpc', '2.0');",
+          "        pm.expect(responseJson).to.have.property('id');",
+          "        // Should have either result or error, but not both",
+          "        const hasResult = responseJson.hasOwnProperty('result');",
+          "        const hasError = responseJson.hasOwnProperty('error');",
+          "        pm.expect(hasResult || hasError).to.be.true;",
+          "        pm.expect(hasResult && hasError).to.be.false;",
+          "    });",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
+} 

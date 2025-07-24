@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Router Agent (Both FastAPI and A2A)
+  router-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: router-agent:optimized
+    container_name: router-agent
+    ports:
+      - "8000:8000"   # FastAPI Server
+      - "10000:10000" # A2A Server
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - router-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:8000/agents || curl -f http://localhost:10000/agents"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+networks:
+  router-network:
+    driver: bridge
+    name: router-network
