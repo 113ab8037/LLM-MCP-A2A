@@ -37,10 +37,10 @@ class RemoteAgentConnections:
         task_callback: TaskUpdateCallback | None,
         streaming: bool
     ) -> Task | Message | None:
-        # Логируем отправку сообщения к удаленному агенту
+        # Logging message sending to a remote agent
         logging.info(f"🔗 REMOTE CONNECTION: Sending to {self.card.name}")
         
-        # Логируем детали сообщения и контекста
+        # We log message details and context
         message = request.message
         logging.info(f"📝 Message: {message}")
         logging.info(f"📝 Message role: {message.role}")
@@ -49,7 +49,7 @@ class RemoteAgentConnections:
         logging.info(f"🎯 Context ID: {message.contextId}")
         logging.info(f"📋 Task ID: {message.taskId}")
         
-        # Логируем размер контента
+        # Logging content size
         if message.parts:
             for i, part in enumerate(message.parts):
                 if part and part.root:
@@ -60,7 +60,7 @@ class RemoteAgentConnections:
                     else:
                         logging.info(f"📄 Part {i+1}: {type(part.root).__name__}")
         
-        # Логируем конфигурацию
+        # Logging the configuration
         config = request.configuration
         if config:
             logging.info(f"⚙️ Config output modes: {config.acceptedOutputModes}")

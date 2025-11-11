@@ -22,7 +22,7 @@ from starlette.requests import Request
 import os
 load_dotenv()
 
-# Настройка детального логирования
+# Setting up detailed logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -35,7 +35,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware для логирования всех HTTP запросов и ответов"""
     
     async def dispatch(self, request: Request, call_next):
-        # Логируем входящий запрос
+        # Logging the incoming request
         start_time = datetime.now()
         
         logger.info(f"🔄 INCOMING REQUEST - {request.method} {request.url}")
@@ -43,7 +43,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         
         try:
             if request.headers.get("content-type", "").startswith("application/json"):
-                # Сохраняем body для повторного использования
+                # Save the body for reuse
                 body = await request.body()
                 if body:
                     try:
@@ -54,10 +54,10 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.warning(f"Could not read request body: {e}")
         
-        # Обрабатываем запрос
+        # Processing your request
         response = await call_next(request)
         
-        # Логируем ответ
+        # Logging the response
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
         
@@ -91,7 +91,7 @@ async def async_main(host, port, phoenix, remote_agent_addresses):
             url_agent=os.getenv("URL_AGENT")
             agent_card = AgentCard(
                 name='Router',
-                description='перенаправляет запросы на других агентов',
+                description='redirects requests to other agents',
                 url=url_agent,
                 version='1.0.0',
                 defaultInputModes=my_agent_executor.agent.SUPPORTED_CONTENT_TYPES,

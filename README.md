@@ -1,230 +1,229 @@
-# AI Agent Project with Google ADK, A2A Protocol and MCP Integration
+# AI Agent Project with Google ADK, A2A Protocol, and MCP Integration
 
-Этот проект представляет собой реализацию AI агента с интеграцией Google ADK (Agent Development Kit), поддерживающего A2A (Agent-to-Agent) протокол для взаимодействия с другими агентами и расширяемого через MCP (Model Context Protocol) серверы. Проект включает в себя готовую инфраструктуру для разработки, тестирования и развертывания AI агентов с мониторингом и трейсингом.
+This project is an implementation of an AI agent with Google ADK (Agent Development Kit) integration, supporting the A2A (Agent-to-Agent) protocol for interacting with other agents and extensible via MCP (Model Context Protocol) servers. The project includes a ready-to-use infrastructure for developing, testing, and deploying AI agents with monitoring and tracing.
 
-Подробная документация по A2A протоколу: [документация](./documentation-a2a-russian.md) и [Postman-коллекция](./postman-collection-a2a-spec.json)
+Detailed documentation on the A2A protocol: [documentation](./documentation-a2a-russian.md) and [Postman-collection](./postman-collection-a2a-spec.json)
 
-## 🎯 Особенности
+## 🎯 Features
 
-- **Google ADK Integration** - Использование передового SDK для разработки агентов
-- **MCP Tools Support** - Интеграция с Model Context Protocol для расширяемых инструментов
-- **LiteLLM** - Поддержка различных LLM моделей через единый интерфейс
-- **Phoenix Monitoring** - Опциональный мониторинг и трейсинг выполнения
-- **Docker Ready** - Полная контейнеризация с автоматической настройкой
-- **A2A Protocol** - Agent-to-Agent коммуникация
-- **Flexible Configuration** - Настройка через переменные окружения
+- **Google ADK Integration** - Uses an industry-leading SDK for agent development
+- **MCP Tools Support** - Integration with the Model Context Protocol for extensible tools
+- **LiteLLM** - Support for various LLM models through a single interface
+- **Phoenix Monitoring** - Optional monitoring and execution tracing
+- **Docker Ready** - Full containerization with automatic configuration
+- **A2A Protocol** - Agent-to-Agent communication
+- **Flexible Configuration** - Configuration via environment variables
 
-## 📁 Структура проекта
+## 📁 Structure Project
 
 ```
 a2a-adk-mcp-example/
-├── agent/                  # Директория агента
-│   ├── app/                # Основной код приложения
-│   │   ├── __main__.py     # Точка входа с Click CLI
-│   │   ├── agent.py        # Класс AgentEvolution
-│   │   └── agent_executor.py  # Исполнитель агента
-│   ├── .env.example        # Пример файла конфигурации
-│   ├── pyproject.toml      # Конфигурация проекта и зависимости
-│   └── README.md           # Документация агента
-├── mcp-weather/            # MCP сервер погоды
-│   ├── server.py           # Основной сервер
-│   ├── Dockerfile          # Docker конфигурация
-│   └── README.md           # Документация MCP сервера
-├── nginx/                  # Nginx конфигурация
-├── docker-compose.phoenix.yml  # Конфигурация с Phoenix
-├── docker-compose.yml      # Основная конфигурация Docker Compose
-├── Makefile                # Автоматизация команд
-└── .gitignore              # Игнорируемые файлы
+├── agent/ # Agent directory
+│ ├── app/ # Main application code
+│ │ ├── __main__.py # Click CLI entry point
+│ │ ├── agent.py # AgentEvolution class
+│ │ └── agent_executor.py # Agent executor
+│ ├── .env.example # Sample configuration file
+│ ├── pyproject.toml # Project configuration and dependencies
+│ └── README.md # Agent documentation
+├── mcp-weather/ # MCP Weather Server
+│ ├── server.py # Main server
+│ ├── Dockerfile # Docker configuration
+│ └── README.md # MCP Server Documentation
+├── nginx/ # Nginx configuration
+├── docker-compose.phoenix.yml # Phoenix configuration
+├── docker-compose.yml # Main Docker Compose configuration
+├── Makefile # Command automation
+└── .gitignore # Ignored files
 ```
 
-## 🛠 Установка и быстрый старт
+## 🛠 Installation and Quick Start
 
-### Быстрый старт с Docker (рекомендуется)
+### Docker Quick Start (recommended)
 
 ```bash
-# Сборка образов
+# Building images
 make build
 
-# Запуск основных сервисов
+# Starting basic services
 make up
 
-# Агент будет доступен на http://localhost:10002
-# MCP сервер будет доступен на http://localhost:8001
+# The agent will be available at http://localhost:10002
+# The MCP server will be available at http://localhost:8001
 ```
 
-### Использование Makefile
+### Using Makefile
 
 ```bash
-# Просмотр всех доступных команд
+# Viewing all available commands
 make help
 
-# Запуск основных сервисов
+# Starting basic services
 make up
 
-# Запуск с Phoenix мониторингом
+# Running with Phoenix monitoring
 make phoenix
 
-# Режим разработки
+# Development mode
 make dev
 
-# Просмотр логов
+# Viewing logs
 make logs
 
-# Остановка всех сервисов
+# Stopping all services
 make down
 ```
 
-## ⚙️ Конфигурация
+## ⚙️ Configuration
 
-### Создание файла окружения
+### Creating an environment file
 
 ```bash
-# Создание .env файла из примера
+# Creating a .env file from the example
 make env
 
-# Или вручную
+# Or manually
 cp agent/.env.example .env
 ```
 
-### Основные переменные окружения
+### Basic environment variables
 
-В файле `.env` можно настроить следующие параметры:
+The following parameters can be configured in the `.env` file:
 
 ```bash
-# Основные настройки агента
+# Basic settings Agent
 AGENT_NAME=jira_mcp_agent
-AGENT_DESCRIPTION="Jira MCP агент для управления проектами, задачами, спринтами и agile-процессами"
+AGENT_DESCRIPTION="Jira MCP agent for managing projects, tasks, sprints, and agile processes"
 AGENT_VERSION=1.0.0
 
-# Конфигурация модели
+# Model Configuration
 LLM_MODEL="evolution_inference/model-for-agent-space-test"
 LLM_API_BASE="https://your-model-api-base-url/v1"
 
 # MCP Configuration
 MCP_URL=http://mcp-weather:8001/sse
 
-# Phoenix мониторинг (опционально)
+# Phoenix Monitoring (optional)
 PHOENIX_PROJECT_NAME="ip_agent_adk"
 PHOENIX_ENDPOINT="http://phoenix:6006/v1/traces"
 
-# Серверные настройки
+# Server Settings
 HOST="0.0.0.0"
 PORT="10002"
 
-# Мониторинг
+# Monitoring
 ENABLE_PHOENIX="false"
 ENABLE_MONITORING="true"
 ```
 
-## 🚀 Использование
+## 🚀 Usage
 
-### Запуск агента
+### Starting the agent
 
 ```bash
-# Запуск основных сервисов
+# Starting the main services
 make up
 
-# Агент будет доступен на http://localhost:10002
+# The agent will be available at http://localhost:10002
 ```
 
-### Режим разработки
+### Development mode
 
 ```bash
-# Запуск в режиме разработки с live reload
+# Running in development mode with live reload
 make dev
 
-# Запуск с Phoenix мониторингом для отладки
+# Running with Phoenix monitoring for debugging
 make dev-phoenix
 ```
 
-### Проверка состояния
+### Checking status
 
 ```bash
-# Статус всех сервисов
+# Status of all services
 make status
 
-# Проверка здоровья
+# Health check
 make health
 
-# Просмотр логов
+# Viewing logs
 make logs
 ```
+## 🧩 Project Components
 
-## 🧩 Компоненты проекта
+### Agent (agent/)
 
-### Агент (agent/)
-
-Основной компонент проекта - AI агент на базе Google ADK с поддержкой MCP инструментов. Агент реализует A2A Protocol для взаимодействия с другими агентами.
+The main component of the project is an AI agent based on Google ADK with support for MCP tools. The agent implements the A2A Protocol for interacting with other agents.
 
 #### API Endpoints
 
-- `GET /` - Информация об агенте (Agent Card)
-- `POST /tasks` - Создание новой задачи
-- `GET /tasks/{task_id}` - Получение статуса задачи
-- `GET /tasks/{task_id}/stream` - SSE поток выполнения задачи
+- `GET /` - Agent Information (Agent Card)
+- `POST /tasks` - Create a new task
+- `GET /tasks/{task_id}` - Get task status
+- `GET /tasks/{task_id}/stream` - SSE task execution stream
 
-### MCP Сервер погоды (mcp-weather/)
+### MCP Weather Server (mcp-weather/)
 
-Сервер предоставляет инструменты для получения данных о погоде через MCP протокол. Использует бесплатное Open-Meteo API.
+The server provides tools for retrieving weather data via the MCP protocol. It uses the free Open-Meteo API.
 
-#### Инструменты
+#### Tools
 
-- `get_today_weather(city: str)` - Получает актуальную погоду на сегодня для указанного города
-- `get_weekly_forecast(city: str)` - Получает прогноз погоды на неделю для указанного города
+- `get_today_weather(city: str)` - Gets today's current weather for the specified city
+- `get_weekly_forecast(city: str)` - Gets the weekly weather forecast for the specified city
 
 #### Endpoints
 
 - **SSE**: `http://localhost:8001/sse`
 - **Messages**: `http://localhost:8001/messages/`
 
-## 📊 Мониторинг
+## 📊 Monitoring
 
 ### Phoenix Tracing
 
-Для включения Phoenix мониторинга установите переменную окружения:
+To enable Phoenix monitoring, set the environment variable:
 
 ```bash
 ENABLE_PHOENIX=true
 ```
 
-Запустите с Phoenix:
+Run with Phoenix:
 
 ```bash
 make phoenix
 ```
 
-Phoenix Dashboard будет доступен на http://localhost:6006
+Phoenix Dashboard will be available at http://localhost:6006
 
-## 🐳 Docker команды
+## 🐳 Docker Commands
 
 ```bash
-# Основные команды
-make build          # Сборка образов
-make up            # Запуск сервисов
-make down          # Остановка сервисов
-make restart       # Перезапуск
-make logs          # Просмотр логов
+# Basic Commands
+make build # Build images
+make up # Start services
+make down # Stop services
+make restart # Restart
+make logs # View logs
 
-# Phoenix мониторинг
-make phoenix       # Запуск с мониторингом
-make phoenix-down  # Остановка Phoenix
+# Phoenix Monitoring
+make phoenix # Start with monitoring
+make phoenix-down # Stop Phoenix
 
-# Утилиты
-make shell         # Вход в контейнер агента
-make clean         # Очистка Docker ресурсов
+# Utilities
+make shell # Enter the agent container
+make clean # Clean up Docker resources
 ```
 
-## 📋 Требования
+## 📋 Requirements
 
-- **Docker**: Для контейнеризации
-- **Make**: Для автоматизации команд
-- **MCP Server**: Для инструментов (опционально)
+- **Docker**: For containerization
+- **Make**: For command automation
+- **MCP Server**: For tools (optional)
 
-## 📄 Лицензия
+## 📄 License
 
-Этот проект распространяется под лицензией MIT. См. файл `LICENSE` для подробностей (если имеется).
+This project is distributed under the MIT license. See the `LICENSE` file for details (if present).
 
-## 🔗 Полезные ссылки
+## 🔗 Useful links
 
 - [Google ADK Documentation](https://developers.google.com/adk)
 - [Model Context Protocol](https://modelcontextprotocol.io/)

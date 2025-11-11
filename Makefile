@@ -1,198 +1,198 @@
 # AI Agent Template Makefile
-# Команды для управления Docker Compose конфигурациями
+# Commands for managing Docker Compose configurations
 
 .PHONY: help build up down restart logs clean test dev phoenix phoenix-up phoenix-down agent-up agent-down network
 
-# Цвета для вывода
+# Colors for output
 GREEN := \033[32m
 YELLOW := \033[33m
 RED := \033[31m
 BLUE := \033[34m
 RESET := \033[0m
 
-# Переменные
+# Variables
 COMPOSE_FILE := docker-compose.yml
 PHOENIX_COMPOSE_FILE := docker-compose.phoenix.yml
 PROJECT_NAME := ai-agent-template
 NETWORK_NAME := agent-network
 
-# Помощь
-help: ## Показать это сообщение помощи
-	@echo "$(GREEN)AI Agent Template - Makefile команды$(RESET)"
+# Help
+help: ## Show this help message
+	@echo "$(GREEN)AI Agent Template - Makefile teams$(RESET)"
 	@echo ""
-	@echo "$(BLUE)Основные команды:$(RESET)"
+	@echo "$(BLUE)Main teams:$(RESET)"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(GREEN)%-15s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "$(YELLOW)Примеры использования:$(RESET)"
-	@echo "  make up          # Запустить основные сервисы"
-	@echo "  make phoenix     # Запустить с Phoenix мониторингом"
-	@echo "  make dev         # Режим разработки"
-	@echo "  make logs        # Посмотреть логи"
-	@echo "  make clean       # Очистить все"
+	@echo "$(YELLOW)Examples of use:$(RESET)"
+	@echo "  make up          # Start core services"
+	@echo "  make phoenix     # Run with Phoenix monitoring"
+	@echo "  make dev         # Development mode"
+	@echo "  make logs        # View logs"
+	@echo "  make clean       # Clear all"
 
 # Создание сети Docker
 network: ## Создать Docker сеть
-	@echo "$(BLUE)Создание Docker сети...$(RESET)"
+	@echo "$(BLUE)Creating a Docker network...$(RESET)"
 	@docker network create $(NETWORK_NAME) 2>/dev/null || echo "$(YELLOW)Сеть $(NETWORK_NAME) уже существует$(RESET)"
 
 # Основные команды
 build: network ## Собрать Docker образы
-	@echo "$(BLUE)Сборка Docker образов...$(RESET)"
+	@echo "$(BLUE)Building Docker images...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) build
 
-up: network ## Запустить основные сервисы
-	@echo "$(GREEN)Запуск основных сервисов...$(RESET)"
+up: network ## Start core services
+	@echo "$(GREEN)Launching core services...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) up -d
-	@echo "$(GREEN)✅ Сервисы запущены!$(RESET)"
-	@echo "$(YELLOW)Агент доступен на: http://localhost:10002$(RESET)"
+	@echo "$(GREEN)✅ Services are running!$(RESET)"
+	@echo "$(YELLOW)Agent available at: http://localhost:10002$(RESET)"
 
-down: ## Остановить все сервисы
-	@echo "$(RED)Остановка сервисов...$(RESET)"
+down: ## Stop all services
+	@echo "$(RED)Stopping services...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) down 2>/dev/null || true
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) down 2>/dev/null || true
-	@echo "$(GREEN)✅ Сервисы остановлены$(RESET)"
+	@echo "$(GREEN)✅ Services have been stopped$(RESET)"
 
-restart: down up ## Перезапустить сервисы
+restart: down up ## Restart services
 
-# Phoenix мониторинг
-phoenix: phoenix-up ## Запустить с Phoenix мониторингом (алиас)
+# Phoenix monitoring
+phoenix: phoenix-up ## Run with Phoenix monitoring (alias)
 
 phoenix-up: network ## Запустить сервисы с Phoenix мониторингом
-	@echo "$(GREEN)Запуск сервисов с Phoenix мониторингом...$(RESET)"
+	@echo "$(GREEN)Launching services with Phoenix monitoring...$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) up -d
-	@echo "$(GREEN)✅ Сервисы с Phoenix запущены!$(RESET)"
-	@echo "$(YELLOW)Агент доступен на: http://localhost:10002$(RESET)"
+	@echo "$(GREEN)✅ Phoenix services launched!$(RESET)"
+	@echo "$(YELLOW)Agent available at: http://localhost:10002$(RESET)"
 	@echo "$(YELLOW)Phoenix Dashboard: http://localhost:6006$(RESET)"
 
-phoenix-down: ## Остановить Phoenix сервисы
-	@echo "$(RED)Остановка Phoenix сервисов...$(RESET)"
+phoenix-down: ## Stop Phoenix services
+	@echo "$(RED)Phoenix services shutdown...$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) down
-	@echo "$(GREEN)✅ Phoenix сервисы остановлены$(RESET)"
+	@echo "$(GREEN)✅ Phoenix services have been stopped$(RESET)"
 
-phoenix-restart: phoenix-down phoenix-up ## Перезапустить Phoenix сервисы
+phoenix-restart: phoenix-down phoenix-up ## Restart Phoenix services
 
-# Отдельный запуск агента
-agent-up: network ## Запустить только агент
-	@echo "$(GREEN)Запуск агента...$(RESET)"
+# Separate agent launch
+agent-up: network ## Run agent only
+	@echo "$(GREEN)Launching the agent...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) up -d evolution-agent
-	@echo "$(GREEN)✅ Агент запущен на http://localhost:10002$(RESET)"
+	@echo "$(GREEN)✅ The agent is running on http://localhost:10002$(RESET)"
 
-agent-down: ## Остановить только агент
-	@echo "$(RED)Остановка агента...$(RESET)"
+agent-down: ## Stop agent only
+	@echo "$(RED)Stopping an agent...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) stop evolution-agent
-	@echo "$(GREEN)✅ Агент остановлен$(RESET)"
+	@echo "$(GREEN)✅ Agent stopped$(RESET)"
 
-# Логи и мониторинг
-logs: ## Показать логи всех сервисов
-	@echo "$(BLUE)Логи сервисов:$(RESET)"
+# Logs and monitoring
+logs: ## Show logs of all services
+	@echo "$(BLUE)Service logs:$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) logs -f --tail=100
 
-logs-agent: ## Показать логи только агента
-	@echo "$(BLUE)Логи агента:$(RESET)"
+logs-agent: ## Show agent logs only
+	@echo "$(BLUE)Agent logs:$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) logs -f --tail=100 evolution-agent
 
-logs-phoenix: ## Показать логи Phoenix сервисов
-	@echo "$(BLUE)Логи Phoenix:$(RESET)"
+logs-phoenix: ## Show Phoenix service logs
+	@echo "$(BLUE)Phoenix Logs:$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) logs -f --tail=100
 
-status: ## Показать статус сервисов
-	@echo "$(BLUE)Статус основных сервисов:$(RESET)"
+status: ## Show service status
+	@echo "$(BLUE)Status of core services:$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) ps
 	@echo ""
-	@echo "$(BLUE)Статус Phoenix сервисов:$(RESET)"
+	@echo "$(BLUE)Phoenix Services Status:$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) ps 2>/dev/null || echo "$(YELLOW)Phoenix сервисы не запущены$(RESET)"
 
-# Разработка
-dev: network ## Режим разработки (с автоперезагрузкой)
-	@echo "$(GREEN)Запуск в режиме разработки...$(RESET)"
+# Development
+dev: network ## Development mode (with auto-reboot)
+	@echo "$(GREEN)Launch in development mode...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) up --build
-	@echo "$(YELLOW)Для выхода нажмите Ctrl+C$(RESET)"
+	@echo "$(YELLOW)To exit, press Ctrl+C$(RESET)"
 
-dev-phoenix: network ## Режим разработки с Phoenix
-	@echo "$(GREEN)Запуск в режиме разработки с Phoenix...$(RESET)"
+dev-phoenix: network ## Development mode with Phoenix
+	@echo "$(GREEN)Running in development mode with Phoenix...$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) up --build
 	@echo "$(YELLOW)Phoenix Dashboard: http://localhost:6006$(RESET)"
-	@echo "$(YELLOW)Для выхода нажмите Ctrl+C$(RESET)"
+	@echo "$(YELLOW)To exit, press Ctrl+C$(RESET)"
 
-# Тестирование
-test: ## Запустить тесты
-	@echo "$(BLUE)Запуск тестов...$(RESET)"
+# Testing
+test: ## Run tests
+	@echo "$(BLUE)Running tests...$(RESET)"
 	@docker run --rm -v $(PWD):/app -w /app python:3.12 bash -c "\
 		pip install -r requirements.txt && \
 		python -m pytest tests/ -v"
 
-test-mcp: phoenix-up ## Тестировать MCP трейсинг
-	@echo "$(BLUE)Тестирование MCP трейсинга...$(RESET)"
-	@sleep 5  # Ждем запуска сервисов
+test-mcp: phoenix-up ## Test MCP tracing
+	@echo "$(BLUE)Testing MCP tracing...$(RESET)"
+	@sleep 5  # We are waiting for the launch of services
 	@python test_mcp_tracing.py
-	@echo "$(YELLOW)Проверьте Phoenix Dashboard: http://localhost:6006$(RESET)"
+	@echo "$(YELLOW)Check it out Phoenix Dashboard: http://localhost:6006$(RESET)"
 
 # Очистка
-clean: down ## Очистить контейнеры и образы
-	@echo "$(RED)Очистка Docker ресурсов...$(RESET)"
+clean: down ## Clean containers and images
+	@echo "$(RED)Cleaning up Docker resources...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) down --rmi all --volumes --remove-orphans 2>/dev/null || true
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) down --rmi all --volumes --remove-orphans 2>/dev/null || true
-	@echo "$(GREEN)✅ Очистка завершена$(RESET)"
+	@echo "$(GREEN)✅ Cleaning is complete$(RESET)"
 
-clean-volumes: ## Удалить все volumes
-	@echo "$(RED)Удаление volumes...$(RESET)"
+clean-volumes: ## Delete all volumes
+	@echo "$(RED)Deleting volumes...$(RESET)"
 	@docker volume prune -f
 	@echo "$(GREEN)✅ Volumes удалены$(RESET)"
 
-clean-all: clean clean-volumes ## Полная очистка
-	@echo "$(RED)Полная очистка Docker системы...$(RESET)"
+clean-all: clean clean-volumes ## Complete cleaning
+	@echo "$(RED)Complete cleaning of the Docker system...$(RESET)"
 	@docker system prune -af
 	@echo "$(GREEN)✅ Полная очистка завершена$(RESET)"
 
-# Утилиты
-shell: ## Войти в shell контейнера агента
-	@echo "$(BLUE)Вход в shell агента...$(RESET)"
+# Utilities
+shell: ## Login to the agent container shell
+	@echo "$(BLUE)Login to the shell agent...$(RESET)"
 	@docker-compose -f $(COMPOSE_FILE) exec evolution-agent /bin/bash
 
-shell-phoenix: ## Войти в shell Phoenix контейнера
-	@echo "$(BLUE)Вход в shell Phoenix...$(RESET)"
+shell-phoenix: ## Login to the Phoenix container shell
+	@echo "$(BLUE)Login to Shell Phoenix...$(RESET)"
 	@docker-compose -f $(PHOENIX_COMPOSE_FILE) exec phoenix /bin/bash
 
-install: ## Установить зависимости локально
-	@echo "$(BLUE)Установка зависимостей...$(RESET)"
+install: ## Install dependencies locally
+	@echo "$(BLUE)Installing dependencies...$(RESET)"
 	@pip install -r requirements.txt
-	@echo "$(GREEN)✅ Зависимости установлены$(RESET)"
+	@echo "$(GREEN)✅ Dependencies are installed$(RESET)"
 
-env: ## Создать файл окружения из примера
-	@echo "$(BLUE)Создание .env файла...$(RESET)"
+env: ## Create an environment file from the example
+	@echo "$(BLUE)Creating an .env file...$(RESET)"
 	@if [ ! -f .env ]; then \
 		cp .env.example .env; \
-		echo "$(GREEN)✅ .env файл создан из .env.example$(RESET)"; \
-		echo "$(YELLOW)⚠️  Отредактируйте .env файл с вашими настройками$(RESET)"; \
+		echo "$(GREEN)✅ .env file created from .env.example$(RESET)"; \
+		echo "$(YELLOW)⚠️  Edit .env file with your settings$(RESET)"; \
 	else \
-		echo "$(YELLOW)⚠️  .env файл уже существует$(RESET)"; \
+		echo "$(YELLOW)⚠️  .env the file already exists$(RESET)"; \
 	fi
 
-# Информация
-info: ## Показать информацию о проекте
+# Information
+info: ## Show project information
 	@echo "$(GREEN)🤖 AI Agent Template$(RESET)"
 	@echo "$(BLUE)════════════════════════════════════════$(RESET)"
-	@echo "$(YELLOW)Проект:$(RESET) AI Agent с Phoenix мониторингом"
-	@echo "$(YELLOW)Версия:$(RESET) 0.1.0"
-	@echo "$(YELLOW)Основные порты:$(RESET)"
-	@echo "  • Агент: http://localhost:10002"
+	@echo "$(YELLOW)Project:$(RESET) AI Agent with Phoenix monitoring"
+	@echo "$(YELLOW)Version:$(RESET) 0.1.0"
+	@echo "$(YELLOW)Main ports:$(RESET)"
+	@echo "  • Agent: http://localhost:10002"
 	@echo "  • Phoenix: http://localhost:6006"
-	@echo "$(YELLOW)Docker Compose файлы:$(RESET)"
-	@echo "  • $(COMPOSE_FILE) - основные сервисы"
-	@echo "  • $(PHOENIX_COMPOSE_FILE) - с Phoenix мониторингом"
+	@echo "$(YELLOW)Docker Compose files:$(RESET)"
+	@echo "  • $(COMPOSE_FILE) - basic services"
+	@echo "  • $(PHOENIX_COMPOSE_FILE) - with Phoenix monitoring"
 	@echo "$(BLUE)════════════════════════════════════════$(RESET)"
 
-# Проверка здоровья
-health: ## Проверить здоровье сервисов
-	@echo "$(BLUE)Проверка здоровья сервисов...$(RESET)"
-	@echo "$(YELLOW)Агент:$(RESET)"
-	@curl -s http://localhost:10002/health 2>/dev/null || echo "$(RED)❌ Агент недоступен$(RESET)"
+# Health check
+health: ## Check the health of services
+	@echo "$(BLUE)Checking the health of services...$(RESET)"
+	@echo "$(YELLOW)Agent:$(RESET)"
+	@curl -s http://localhost:10002/health 2>/dev/null || echo "$(RED)❌ Agent unavailable$(RESET)"
 	@echo "$(YELLOW)Phoenix:$(RESET)"
-	@curl -s http://localhost:6006/health 2>/dev/null || echo "$(RED)❌ Phoenix недоступен$(RESET)"
+	@curl -s http://localhost:6006/health 2>/dev/null || echo "$(RED)❌ Phoenix unavailable$(RESET)"
 
-# Резервное копирование
-backup: ## Создать резервную копию данных
-	@echo "$(BLUE)Создание резервной копии...$(RESET)"
+# Backup
+backup: ## Create a backup copy of your data
+	@echo "$(BLUE)Creating a backup copy...$(RESET)"
 	@mkdir -p backups
 	@docker run --rm -v $(PROJECT_NAME)_phoenix_data:/data -v $(PWD)/backups:/backup alpine tar czf /backup/phoenix_data_$(shell date +%Y%m%d_%H%M%S).tar.gz -C /data .
-	@echo "$(GREEN)✅ Резервная копия создана в папке backups/$(RESET)" 
+	@echo "$(GREEN)✅ The backup copy was created in the folder backups/$(RESET)" 

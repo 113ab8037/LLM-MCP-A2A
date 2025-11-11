@@ -29,7 +29,7 @@ import os
 load_dotenv()
 
 
-# Настройка детального логирования
+# Setting up detailed logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,7 +37,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Глобальные переменные для управления состоянием
+# Global variables for state management
 http_client_instance: httpx.AsyncClient | None = None
 host_agent_instance: HostAgent | None = None
 _agent_lock = asyncio.Lock()  # protects modifications of remote agents
@@ -58,7 +58,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         try:
             content_type = request.headers.get("content-type", "")
             if content_type.startswith("application/json"):
-                # Сохраняем body для повторного использования
+                # Save the body for reuse
                 body = await request.body()
                 if body:
                     try:
@@ -71,10 +71,10 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.warning(f"Could not read request body: {e}")
         
-        # Обрабатываем запрос
+        # Processing your request
         response = await call_next(request)
         
-        # Логируем ответ
+        # Logging the response
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
         
@@ -86,17 +86,17 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         return response
 
 
-# Удаляем неиспользуемую модель, так как мы используем JSON напрямую
+# We remove the unused model since we are using JSON directly
 
 
 async def init_global_state():
     """Инициализация глобального состояния"""
     global http_client_instance, host_agent_instance
     
-    # Инициализируем HTTP клиент
+    # Initializing the HTTP client
     http_client_instance = httpx.AsyncClient(timeout=Timeout(timeout=60.0))
     
-    # Инициализируем HostAgent
+    # Initializing HostAgent
     host_agent_instance = HostAgent(
         remote_agent_addresses=[], 
         http_client=http_client_instance
@@ -224,7 +224,7 @@ async def remove_agent(request: Request):
 async def create_unified_app(
     host: str, port: int, remote_agent_addresses: list[str]
 ) -> Starlette:
-    """Создаем объединенное приложение с A2A и управлением агентами"""
+    """Building a unified application with A2A and agent management"""
     
     # Инициализируем глобальное состояние
     await init_global_state()
@@ -234,12 +234,12 @@ async def create_unified_app(
     skill = AgentSkill(
         id='answer_about_cloud_ru_products',
         name='Ответить с перенаправлением вопроса',
-        description='Помогает с продуктами компании cloud.ru',
+        description='Helps with cloud.ru products',
         tags=['cloud.ru'],
         examples=[
-            'Что такое база данных?',
-            'Что такое виртуальная машина?',
-            'Как создать виртуальную машину?'
+            'What is a database?',
+            'What is a virtual machine?',
+            'How do I create a virtual machine?'
         ],
     )
     
@@ -270,21 +270,21 @@ async def create_unified_app(
     
     a2a_app = a2a_server.build()
     
-    # Создаем маршруты для управления агентами
+    # Creating routes to manage agents
     mgm_routes = [
         Route('/mgm/agents', list_agents, methods=['GET']),
         Route('/mgm/agents', add_agent, methods=['POST']),
         Route('/mgm/agents/{agent_name}', remove_agent, methods=['DELETE']),
     ]
     
-    # Создаем основное приложение
+    # Let's create the main application
     routes = mgm_routes + [
-        Mount('/', a2a_app)  # A2A приложение обрабатывает все остальные пути
+        Mount('/', a2a_app)  # A2A application handles all other paths
     ]
     
     app = Starlette(routes=routes)
     
-    # Добавляем CORS middleware
+    # Adding CORS middleware
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -293,7 +293,7 @@ async def create_unified_app(
         allow_headers=["*"],
     )
     
-    # Добавляем middleware для логирования
+    # Adding middleware for logging
     app.add_middleware(RequestLoggingMiddleware)
     
     return app
@@ -304,8 +304,8 @@ async def run_unified_server(
 ):
     """Запускаем объединенный сервер"""
     
-    # Если remote_agent_addresses пустой, пытаемся прочитать из переменной
-    # окружения
+    # If remote_agent_addresses is empty, we try to read from the variable
+    # environment
     if not remote_agent_addresses:
         remote_agent_env = os.getenv("REMOTE_AGENTS", "")
         if remote_agent_env:

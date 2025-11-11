@@ -15,10 +15,10 @@ services:
       - UV_SYSTEM_PYTHON=1
     restart: unless-stopped
     volumes:
-      # Для разработки: синхронизация изменений кода
+      # For development: synchronizing code changes
       - ./mcp-weather/server.py:/app/server.py:ro
       - ./mcp-weather/test:/app/test:ro
-      # Монтируем pyproject.toml для отслеживания изменений зависимостей
+      # Mounting pyproject.toml to track dependency changes
       - ./mcp-weather/pyproject.toml:/app/pyproject.toml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/sse/"]
@@ -26,7 +26,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    # Ограничения ресурсов для стабильной работы
+    # Resource limitations for stable operation
     deploy:
       resources:
         limits:
