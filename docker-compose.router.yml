@@ -28,12 +28,12 @@ services:
       mcp-weather:
         condition: service_healthy
     volumes:
-      # Для разработки: синхронизация изменений кода
+      # For development: synchronizing code changes
       - ./agent/app:/app/app:ro
-      # Монтируем pyproject.toml для отслеживания изменений зависимостей
+      # Mounting pyproject.toml to track dependency changes
       - ./agent/pyproject.toml:/app/pyproject.toml:ro
       - ./agent/uv.lock:/app/uv.lock:ro
-      # Монтируем wheel файл
+      # Mountable wheel file
       - ./agent/litellm-1.72.3-py3-none-any.whl:/app/litellm-1.72.3-py3-none-any.whl:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:10002/.well-known/agent.json')"]
@@ -41,7 +41,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Ограничения ресурсов для стабильной работы
+    # Resource limitations for stable operation
     deploy:
       resources:
         limits:
@@ -67,10 +67,10 @@ services:
       - UV_SYSTEM_PYTHON=1
     restart: unless-stopped
     volumes:
-      # Для разработки: синхронизация изменений кода
+      # For development: synchronizing code changes
       - ./mcp-weather/server.py:/app/server.py:ro
       - ./mcp-weather/test:/app/test:ro
-      # Монтируем pyproject.toml для отслеживания изменений зависимостей
+      # Mounting pyproject.toml to track dependency changes
       - ./mcp-weather/pyproject.toml:/app/pyproject.toml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/sse/"]
@@ -78,7 +78,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Ограничения ресурсов для стабильной работы
+    # Resource limitations for stable operation
     deploy:
       resources:
         limits:

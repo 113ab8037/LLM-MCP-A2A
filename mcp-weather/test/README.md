@@ -1,52 +1,52 @@
-# Тесты MCP сервера погоды
+# MCP Weather Server Tests
 
-Эта папка содержит все тесты для MCP сервера погоды с интеграцией Open-Meteo API.
+This folder contains all tests for the MCP weather server with Open-Meteo API integration.
 
-## Структура тестов
+## Test Structure
 
 ```
 test/
-├── test_weather_api.py     # Unit тесты с mock (быстрые)
-├── test_integration.py     # Интеграционные тесты (с реальным API)
-├── test_tools.py          # Демонстрационные тесты
-├── run_tests.py           # Скрипт для запуска тестов
-├── TESTING.md             # Подробная документация
-└── README.md              # Этот файл
+├── test_weather_api.py     # Unit tests with mocks (fast)
+├── test_integration.py     # Integration tests (with a real API)
+├── test_tools.py          # Demo tests
+├── run_tests.py           # Script for running tests
+├── TESTING.md             # Detailed documentation
+└── README.md              # This file
 ```
 
-## Быстрый старт
+## Quick Start
 
-### Через Makefile (рекомендуется)
+### Via Makefile (recommended)
 ```bash
-# Установить зависимости
+# Install dependencies
 make install
 
-# Запустить основные тесты
+# Run main tests
 make test
 
-# Запустить все тесты с покрытием
+# Run all tests with coverage
 make test-cov
 
-# Показать все команды
+# Show all commands
 make help
 ```
 
-### Через uv напрямую
+### Via uv directly
 ```bash
-# Unit тесты (быстрые)
+# Unit tests (fast)
 uv run pytest test/test_weather_api.py -v
 
-# Интеграционные тесты (медленные, требуют интернет)
+# Integration tests (slow, require internet)
 uv run pytest test/test_integration.py -v -m integration
 
-# Все тесты
+# All tests
 uv run pytest test/ -v
 ```
 
-## Типы тестов
+## Test Types
 
-- **Unit тесты** (`test_weather_api.py`) - быстрые с mock, для разработки
-- **Интеграционные** (`test_integration.py`) - с реальным API, для проверки
-- **Демонстрационные** (`test_tools.py`) - интерактивные, для показа
+- **Unit Tests** (`test_weather_api.py`) - quick tests with mocks, for development
+- **Integration Tests** (`test_integration.py`) - with a real API, for testing
+- **Demo Tests** (`test_tools.py`) - interactive, for demonstration
 
-Подробная документация в файле `TESTING.md`. 
+Detailed documentation in the `TESTING.md` file. 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Скрипт для запуска тестов MCP сервера погоды.
+Script for running MCP weather server tests.
 """
 
 import subprocess
@@ -8,8 +8,8 @@ import sys
 
 
 def run_unit_tests():
-    """Запуск быстрых unit тестов с mock"""
-    print("🧪 Запуск unit тестов (с mock)...")
+    """Running quick unit tests with mocks"""
+    print("🧪 Running unit tests (with mocks)...")
     result = subprocess.run([
         sys.executable, "-m", "pytest", 
         "test_weather_api.py", 
@@ -19,8 +19,8 @@ def run_unit_tests():
 
 
 def run_integration_tests():
-    """Запуск интеграционных тестов с реальным API"""
-    print("🌐 Запуск интеграционных тестов (реальный API)...")
+    """Running integration tests against a real API"""
+    print("🌐 Running integration tests (real API)...")
     result = subprocess.run([
         sys.executable, "-m", "pytest", 
         "test_integration.py", 
@@ -30,15 +30,15 @@ def run_integration_tests():
 
 
 def run_demo_tests():
-    """Запуск демонстрационных тестов"""
-    print("🎬 Запуск демонстрационных тестов...")
+    """Running demo tests"""
+    print("🎬 Running demo tests...")
     result = subprocess.run([sys.executable, "test_tools.py"])
     return result.returncode == 0
 
 
 def run_all_tests():
     """Запуск всех тестов"""
-    print("🔄 Запуск всех тестов...")
+    print("🔄 Run all tests...")
     result = subprocess.run([
         sys.executable, "-m", "pytest", 
         "-v", "--tb=short", 
@@ -49,11 +49,11 @@ def run_all_tests():
 
 
 def main():
-    """Главная функция"""
+    """Main function"""
     import argparse
     
     parser = argparse.ArgumentParser(
-        description="Запуск тестов MCP сервера погоды"
+        description="Running MCP Weather Server Tests"
     )
     parser.add_argument(
         "--type", 
@@ -64,7 +64,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🌤️ Тестирование MCP сервера погоды с Open-Meteo API")
+    print("🌤️ Testing the MCP weather server with the Open-Meteo API")
     print("=" * 60)
     
     success = False
@@ -79,9 +79,9 @@ def main():
         success = run_all_tests()
     
     if success:
-        print("\n✅ Все тесты прошли успешно!")
+        print("\n✅ All tests were successful!")
     else:
-        print("\n❌ Некоторые тесты не прошли!")
+        print("\n❌ Some tests failed!")
         sys.exit(1)
 
 

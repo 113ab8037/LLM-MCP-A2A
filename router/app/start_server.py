@@ -53,8 +53,8 @@ def a2a(host: str, port: int, phoenix: str, remote_agents: str):
         remote_agent_addresses = [addr.strip() for addr in remote_agents.split(',')]
         logger.info(f"🤖 Remote agents: {remote_agent_addresses}")
     elif not remote_agents:
-        # Если не указаны в командной строке, пытаемся прочитать из переменной 
-        # окружения
+        # If not specified on the command line, we try to read from the variable 
+        # environment
         remote_agent_env = os.getenv("REMOTE_AGENT", "")
         if remote_agent_env:
             remote_agent_addresses = [
@@ -113,8 +113,8 @@ def unified(host: str, port: int, remote_agents: str):
         remote_agent_addresses = [addr.strip() for addr in remote_agents.split(',')]
         logger.info(f"🤖 Initial remote agents: {remote_agent_addresses}")
     elif not remote_agents:
-        # Если не указаны в командной строке, пытаемся прочитать из переменной
-        # окружения
+        # If not specified on the command line, we try to read from the variable
+        # environment
         remote_agent_env = os.getenv("REMOTE_AGENT", "")
         if remote_agent_env:
             remote_agent_addresses = [

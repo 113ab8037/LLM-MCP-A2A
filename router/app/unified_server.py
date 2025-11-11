@@ -44,10 +44,10 @@ _agent_lock = asyncio.Lock()  # protects modifications of remote agents
 
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Middleware для логирования всех HTTP запросов и ответов"""
+    """Middleware for logging all HTTP requests and responses"""
     
     async def dispatch(self, request: Request, call_next):
-        # Логируем входящий запрос
+        # Logging the incoming request
         start_time = datetime.now()
         
         logger.info(
@@ -226,14 +226,14 @@ async def create_unified_app(
 ) -> Starlette:
     """Building a unified application with A2A and agent management"""
     
-    # Инициализируем глобальное состояние
+    # Initialize the global state
     await init_global_state()
     
-    # Создаем A2A приложение
+    # Creating an A2A application
     capabilities = AgentCapabilities(streaming=True)
     skill = AgentSkill(
         id='answer_about_cloud_ru_products',
-        name='Ответить с перенаправлением вопроса',
+        name='Reply with question redirection',
         description='Helps with cloud.ru products',
         tags=['cloud.ru'],
         examples=[
@@ -249,7 +249,7 @@ async def create_unified_app(
     url_agent = os.getenv("URL_AGENT", "http://localhost:8000")
     agent_card = AgentCard(
         name='Router',
-        description='перенаправляет запросы на других агентов',
+        description='redirects requests to other agents',
         url=url_agent,
         version='1.0.0',
         defaultInputModes=my_agent_executor.agent.SUPPORTED_CONTENT_TYPES,

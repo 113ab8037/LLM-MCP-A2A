@@ -5,36 +5,36 @@
 [![FastMCP](https://img.shields.io/badge/FastMCP-2.0-green.svg)](https://github.com/jlowin/fastmcp)
 [![Free API](https://img.shields.io/badge/API-Free-brightgreen.svg)](https://open-meteo.com/)
 
-MCP сервер для получения данных о погоде с использованием Open-Meteo API. **Полностью бесплатно без API ключей!** 🎉
+An MCP server for receiving weather data using the Open-Meteo API. **Completely free, no API keys required!** 🎉
 
-## 🚀 Возможности
+## 🚀 Features
 
-- **🌍 Погода сегодня** - актуальная погода для любого города мира
-- **📅 Прогноз на неделю** - детальный недельный прогноз
-- **🔄 Реальные данные** - Open-Meteo API без необходимости API ключей
-- **🌐 Мультиязычность** - поддержка городов с любыми названиями
-- **⚡ Быстро и надежно** - FastMCP 2.0 фреймворк
+- **🌍 Today's Weather** - current weather for any city in the world
+- **📅 Weekly Forecast** - detailed weekly forecast
+- **🔄 Real Data** - Open-Meteo API without API keys
+- **🌐 Multilingual** - supports cities with any name
+- **⚡ Fast and Reliable** - FastMCP 2.0 framework
 
-## 📦 Установка
+## 📦 Installation
 
 ```bash
-# Клонируйте репозиторий
+# Clone the repository
 cd mcp-weather
 
-# Установите зависимости
+# Install dependencies
 uv sync
 
-# Запустите сервер
+# Start the server
 uv run python server.py
 ```
 
-## 🛠️ Доступные инструменты
+## 🛠️ Available tools
 
 ### `get_today_weather(city: str)`
-Получает актуальную погоду на сегодня для указанного города.
+Gets the current weather for today for the specified city.
 
 ```python
-# Примеры использования
+# Usage examples
 await get_today_weather("Москва")
 await get_today_weather("Paris") 
 await get_today_weather("New York")
@@ -42,46 +42,46 @@ await get_today_weather("東京")
 ```
 
 ### `get_weekly_forecast(city: str)`
-Получает прогноз погоды на неделю для указанного города.
+Gets the weekly weather forecast for the specified city.
 
 ```python
-# Примеры использования
-await get_weekly_forecast("Лондон")
+# Usage examples
+await get_weekly_forecast("London")
 await get_weekly_forecast("Berlin")
 await get_weekly_forecast("São Paulo")
 ```
 
-## 🧪 Тестирование
+## 🧪 Testing
 
-Проект включает полный набор тестов:
+The project includes a full set of tests:
 
 ```bash
-# Все тесты
+# All tests
 make test-all
 
-# Unit тесты (быстрые, с моками)
+# Unit tests (fast, with mocks)
 make test-unit
 
-# Интеграционные тесты (с реальным API)
+# Integration tests (with real API)
 make test-integration
 
-# Демонстрационные тесты
+# Demo tests
 make test-demo
 
-# Тесты с покрытием кода
+# Code coverage tests
 make test-cov
 ```
 
 ## 🐳 Docker
 
 ```bash
-# Сборка и запуск
+# Assembly and launch
 docker-compose up --build
 
-# Только сборка
+# Assembly only
 docker build -t mcp-weather .
 
-# Запуск контейнера
+# Launch container
 docker run -p 8001:8001 mcp-weather
 ```
 
@@ -90,45 +90,45 @@ docker run -p 8001:8001 mcp-weather
 - **SSE**: `http://localhost:8001/sse`
 - **Messages**: `http://localhost:8001/messages/`
 
-## 📊 Покрытие тестами
+## 📊 Test Coverage
 
-- **Unit тесты**: 17 тестов
-- **Интеграционные тесты**: 7 тестов  
-- **Демо тесты**: 6 функций
-- **Общее покрытие**: 87%
+- **Unit Tests**: 17 tests
+- **Integration Tests**: 7 tests
+- **Demo Tests**: 6 functions
+- **Overall Coverage**: 87%
 
-## 🏗️ Архитектура
+## 🏗️ Architecture
 
-- **FastMCP 2.0** - MCP фреймворк
-- **httpx** - HTTP клиент
-- **Open-Meteo API** - данные о погоде
-- **pytest** - тестирование
-- **uv** - управление зависимостями
+- **FastMCP 2.0** - MCP framework
+- **httpx** - HTTP client
+- **Open-Meteo API** - weather data
+- **pytest** - testing
+- **uv** - dependency management
 
-## 📄 Лицензия
+## 📄 License
 
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Вклад в проект
+## 🤝 Contributions
 
-Мы приветствуем любые улучшения! 
+We welcome any improvements!
 
-1. **Fork** проект
-2. Создайте **feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit** изменения (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** в branch (`git push origin feature/AmazingFeature`)
-5. Откройте **Pull Request**
+1. **Fork** the project
+2. Create a **feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit** the changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. Open a **Pull Request**
 
-## 🆘 Поддержка
+## 🆘 Support
 
 - 📫 **Issues**: [GitHub Issues](https://github.com/your-username/simple_mcp_server/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/your-username/simple_mcp_server/discussions)
 
-## 🎉 Благодарности
+## 🎉 Thanks
 
-- [FastMCP](https://github.com/jlowin/fastmcp) - отличный MCP фреймворк
-- [Open-Meteo](https://open-meteo.com/) - бесплатное API погоды
+- [FastMCP](https://github.com/jlowin/fastmcp) - excellent MCP framework
+- [Open-Meteo](https://open-meteo.com/) - Free weather API
 
 ---
 
-⭐ **Понравился проект? Поставьте звездочку!** ⭐ 
+⭐ **Did you like the project? Give it a star!** ⭐

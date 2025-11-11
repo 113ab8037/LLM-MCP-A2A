@@ -41,10 +41,10 @@ logger = logging.getLogger(__name__)
 class HostAgent:
     """The host agent manages remote agent connections.
 
-    Все экземпляры используют **общий** реестр, чтобы агенты, добавленные через
-    FastAPI-сервер, сразу становились доступны `RouterAgent`, созданному в другой
-    части приложения. Это исключает дублирование и обеспечивает согласованное
-    состояние во всех объектах *HostAgent* внутри одного процесса.
+    All instances share a **common** registry so that agents added through
+    FastAPI server, immediately became available to `RouterAgent`, created in another
+    parts of the application. This eliminates duplication and ensures consistency
+    state in all *HostAgent* objects within a single process.
     """
 
     # --------- Global shared state ---------
@@ -178,9 +178,9 @@ DO NOT ANSWER BY YOURSELF! USE TOOLS!
         self, callback_context: CallbackContext, llm_request
     ):
         """
-        Эта функция используется для сокращения истории разговора.
-        Она вызывается перед вызовом модели.
-        Она используется для сокращения истории разговора до последних 3 реплик.
+        This feature is used to shorten the conversation history.
+        It is called before the model is called.
+        It is used to shorten the conversation history to the last 3 lines.
         """
         n = len(llm_request.contents)
         logging.info(f"📚 Before model callback - Total contents: {n}")
@@ -292,7 +292,7 @@ DO NOT ANSWER BY YOURSELF! USE TOOLS!
             )
             response = await client.send_message(request, self.task_callback, False)
             
-            # Логируем ответ от удаленного агента
+            # Logging the response from the remote agent
             logging.info(f"📨 Received response from {agent_name}")
             logging.info(f"📦 Response type: {type(response).__name__}")
             

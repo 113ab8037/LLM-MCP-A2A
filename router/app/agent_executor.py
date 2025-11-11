@@ -36,14 +36,14 @@ class MyAgentExecutor(AgentExecutor):
         query = context.get_user_input()
         task = context.current_task
 
-        # Логируем начало обработки запроса
+        # Logging the start of request processing
         logging.info("="*60)
         logging.info("🚀 AGENT EXECUTOR: Starting request processing")
         logging.info(f"📝 Query: {query}")
         logging.info(f"🔍 Current task: {task.id if task else 'None'}")
         logging.info(f"🎯 Context ID: {context.contextId if task else 'None'}")
         
-        # Логируем контекст запроса
+        # Logging the request context
         try:
             context_message = context.message
             logging.info(f"📋 Context message: {context_message}")

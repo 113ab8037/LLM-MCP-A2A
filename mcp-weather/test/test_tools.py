@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Простой тестовый скрипт для демонстрации работы MCP сервера погоды.
-Этот скрипт теперь работает с реальным Open-Meteo API.
+A simple test script to demonstrate the MCP weather server.
+This script now works with the real Open-Meteo API.
 """
 
 import sys
@@ -9,7 +9,7 @@ import os
 import asyncio
 import pytest
 
-# Добавляем родительскую директорию в path для импорта server.py
+# Add the parent directory to the path for importing server.py
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from server import get_today_weather, get_weekly_forecast
@@ -17,8 +17,8 @@ from server import get_today_weather, get_weekly_forecast
 
 @pytest.mark.asyncio
 async def test_today_weather():
-    """Тестирует получение погоды на сегодня"""
-    print("🌤️ Тест получения погоды на сегодня:")
+    """Testing getting today's weather"""
+    print("🌤️ Test for getting today's weather:")
     print("=" * 50)
     
     try:
@@ -26,18 +26,18 @@ async def test_today_weather():
         print(result)
         print()
     except Exception as e:
-        print(f"Ошибка: {e}")
+        print(f"Error: {e}")
         print()
 
 
 @pytest.mark.asyncio
 async def test_weekly_forecast():
-    """Тестирует получение прогноза на неделю"""
-    print("📅 Тест прогноза погоды на неделю:")
+    """Testing getting a weekly forecast"""
+    print("📅 Weekly weather forecast test:")
     print("=" * 50)
     
     try:
-        result = await get_weekly_forecast("Лондон")
+        result = await get_weekly_forecast("London")
         print(result)
         print()
     except Exception as e:
@@ -47,8 +47,8 @@ async def test_weekly_forecast():
 
 @pytest.mark.asyncio
 async def test_different_cities():
-    """Тестирует различные города с разными названиями"""
-    print("🌍 Тест различных городов:")
+    """Tests different cities with different names"""
+    print("🌍 Test of different cities:")
     print("=" * 50)
     
     cities = [
@@ -62,49 +62,49 @@ async def test_different_cities():
     
     for city in cities:
         try:
-            print(f"\n--- Погода сегодня в {city} ---")
+            print(f"\n--- Weather today in {city} ---")
             result = await get_today_weather(city)
             print(result)
         except Exception as e:
-            print(f"Ошибка для {city}: {e}")
+            print(f"Error for {city}: {e}")
 
 
 @pytest.mark.asyncio
 async def test_consistency():
-    """Тестирует консистентность данных для одного города"""
-    print("🔄 Тест консистентности данных:")
+    """Tests data consistency for one city"""
+    print("🔄 Data consistency test:")
     print("=" * 50)
     
-    city = "Берлин"
+    city = "Berlin"
     
     try:
-        print(f"Первый запрос для {city}:")
+        print(f"First request for {city}:")
         result1 = await get_today_weather(city)
         print(result1[:100] + "...")
         
-        print(f"\nВторой запрос для {city}:")
+        print(f"\nSecond request for {city}:")
         result2 = await get_today_weather(city)
         print(result2[:100] + "...")
         
-        # Проверяем, что данные получены
-        print("\nДанные для одного города получены")
+        # We check that the data has been received
+        print("\nData for one city was received")
         
     except Exception as e:
-        print(f"Ошибка: {e}")
+        print(f"Error: {e}")
 
 
 @pytest.mark.asyncio
 async def test_error_handling():
-    """Тестирует обработку ошибок"""
-    print("⚠️ Тест обработки ошибок:")
+    """Tests error handling"""
+    print("⚠️ Error handling test:")
     print("=" * 50)
     
-    # Тест с пустым названием города
+    # Empty city name test
     try:
         result = await get_today_weather("")
         print(result)
     except Exception as e:
-        print(f"Ожидаемая ошибка для пустого города: {e}")
+        print(f"Expected error for an empty city: {e}")
     
     # Тест с пробелами
     try:
@@ -118,35 +118,35 @@ async def test_error_handling():
 
 @pytest.mark.asyncio
 async def test_unicode_cities():
-    """Тестирует города с unicode символами"""
-    print("🌐 Тест городов с unicode символами:")
+    """Tests cities with Unicode characters"""
+    print("🌐 Unicode Cities Test:")
     print("=" * 50)
     
     unicode_cities = [
-        "北京",  # Пекин
-        "München",  # Мюнхен  
-        "São Paulo",  # Сан-Паулу
-        "Москва",  # Москва
-        "العين"  # Аль-Айн
+        "北京",  # Beijing
+        "München",  # Munich  
+        "São Paulo",  # Sao Paulo
+        "Москва",  # Moscow
+        "العين"  # Al Ain
     ]
     
     for city in unicode_cities:
         try:
-            print(f"\n--- Погода в {city} ---")
+            print(f"\n--- Weather in {city} ---")
             result = await get_today_weather(city)
             print(result[:150] + "...")
         except Exception as e:
-            print(f"Ошибка для {city}: {e}")
+            print(f"Error for {city}: {e}")
 
 
 async def run_all_tests():
-    """Запускает все тесты в одном event loop"""
-    print("🧪 Запуск тестов MCP сервера погоды")
+    """Runs all tests in one event loop"""
+    print("🧪 Running MCP Weather Server Tests")
     print("=" * 60)
-    print("🛠️ Тестируем два инструмента с любыми городами:")
+    print("🛠️ We test two tools with any cities:")
     print("   - get_today_weather(city)")
     print("   - get_weekly_forecast(city)")
-    print("🌍 Теперь поддерживаются любые названия городов!")
+    print("🌍 Now any city names are supported!")
     print()
     
     # Запускаем все тесты в одном event loop
@@ -157,11 +157,11 @@ async def run_all_tests():
     await test_unicode_cities()
     await test_error_handling()
     
-    print("✅ Все тесты завершены!")
+    print("✅ All tests completed!")
 
 
 def main():
-    """Главная функция для запуска всех тестов"""
+    """The main function for running all tests"""
     asyncio.run(run_all_tests())
 
 

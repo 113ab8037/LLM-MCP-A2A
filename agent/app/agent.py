@@ -14,14 +14,14 @@ litellm._turn_on_debug()
 
 class AgentEvolution:
     """
-    AgentEvolution - передовой ИИ агент с эволюционными возможностями.
+    AgentEvolution - an advanced AI agent with evolutionary capabilities.
     """
 
     SUPPORTED_CONTENT_TYPES = ['text', 'text/plain']
     STREAM_TIMEOUT = 300  # 5 minutes timeout
 
     def __init__(self):
-        # Phoenix отключен (нет зависимостей)
+        # Phoenix is ​​disabled (no dependencies)
         self._agent = self._build_agent()
         self._user_id = 'remote_agent'
         self._runner = Runner(
@@ -36,8 +36,8 @@ class AgentEvolution:
         return os.getenv('PROCESSING_MESSAGE')
 
     def _build_agent(self) -> LlmAgent:
-        """Создает LLM агента с эволюционными возможностями."""
-        # Создаем toolset без специфических параметров для совместимости
+        """Creates an LLM agent with evolutionary capabilities."""
+        # Create a toolset without specific parameters for compatibility
         mcp_url = os.getenv('MCP_URL')
         if mcp_url:
             toolset = MCPToolset(connection_params=SseConnectionParams(url=mcp_url))

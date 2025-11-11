@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Pytest тесты для MCP сервера погоды с Open-Meteo API интеграцией.
+Pytest tests for MCP weather server with Open-Meteo API integration.
 """
 
 import pytest
@@ -8,7 +8,7 @@ import sys
 import os
 from unittest.mock import patch, Mock
 
-# Добавляем родительскую папку в path для импорта server.py
+# Add the parent folder to the path for importing server.py
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import httpx
@@ -24,7 +24,7 @@ from server import (
 )
 
 
-# Мок данные для тестов
+# Mock data for tests
 MOCK_GEOCODING_RESPONSE = {
     "results": [
         {
@@ -67,11 +67,11 @@ MOCK_WEATHER_RESPONSE = {
 
 
 class TestCityCoordinates:
-    """Тесты для получения координат города"""
+    """Tests to obtain city coordinates"""
     
     @pytest.mark.asyncio
     async def test_get_city_coordinates_success(self):
-        """Тест успешного получения координат"""
+        """Test of successful receipt of coordinates"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_response = Mock()
             mock_response.json.return_value = MOCK_GEOCODING_RESPONSE
@@ -86,7 +86,7 @@ class TestCityCoordinates:
     
     @pytest.mark.asyncio
     async def test_get_city_coordinates_not_found(self):
-        """Тест когда город не найден"""
+        """Test when the city is not found"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_response = Mock()
             mock_response.json.return_value = {"results": []}
@@ -100,7 +100,7 @@ class TestCityCoordinates:
     
     @pytest.mark.asyncio
     async def test_get_city_coordinates_http_error(self):
-        """Тест обработки HTTP ошибки"""
+        """HTTP error handling test"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_client.return_value.__aenter__.return_value.get.side_effect = httpx.HTTPStatusError(
                 "404 Not Found", 
@@ -118,7 +118,7 @@ class TestWeatherData:
     
     @pytest.mark.asyncio
     async def test_get_weather_data_success(self):
-        """Тест успешного получения данных о погоде"""
+        """Test of successful weather data retrieval"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_response = Mock()
             mock_response.json.return_value = MOCK_WEATHER_RESPONSE
@@ -132,7 +132,7 @@ class TestWeatherData:
     
     @pytest.mark.asyncio
     async def test_get_weather_data_http_error(self):
-        """Тест обработки HTTP ошибки при получении погоды"""
+        """Testing HTTP error handling when retrieving weather"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_client.return_value.__aenter__.return_value.get.side_effect = httpx.HTTPStatusError(
                 "500 Internal Server Error",
@@ -145,27 +145,27 @@ class TestWeatherData:
 
 
 class TestWeatherCodeConversion:
-    """Тесты для конвертации кодов погоды"""
+    """Weather code conversion tests"""
     
     def test_weather_code_to_description_known_codes(self):
-        """Тест конвертации известных кодов"""
-        assert weather_code_to_description(0) == "ясно"
-        assert weather_code_to_description(3) == "пасмурно"
-        assert weather_code_to_description(61) == "легкий дождь"
-        assert weather_code_to_description(95) == "гроза"
+        """Test conversion of known codes"""
+        assert weather_code_to_description(0) == "clear"
+        assert weather_code_to_description(3) == "cloudy"
+        assert weather_code_to_description(61) == "light rain"
+        assert weather_code_to_description(95) == "storm"
     
     def test_weather_code_to_description_unknown_code(self):
-        """Тест конвертации неизвестного кода"""
+        """Unknown code conversion test"""
         result = weather_code_to_description(999)
-        assert "неизвестно (код 999)" in result
+        assert "unknown (code 999)" in result
 
 
 class TestRealWeatherData:
-    """Тесты для получения реальных данных о погоде"""
+    """Tests to obtain real weather data"""
     
     @pytest.mark.asyncio
     async def test_get_real_weather_data_success(self):
-        """Тест успешного получения реальных данных"""
+        """Test of successful acquisition of real data"""
         with patch('server.get_city_coordinates') as mock_coords, \
              patch('server.get_weather_data') as mock_weather:
             
@@ -181,11 +181,11 @@ class TestRealWeatherData:
             }
             assert len(result['forecast']) == 3
             assert result['current_weather']['temperature'] == -5
-            assert result['current_weather']['condition'] == "пасмурно"
+            assert result['current_weather']['condition'] == "cloudy"
     
     @pytest.mark.asyncio
     async def test_get_real_weather_data_city_not_found(self):
-        """Тест когда город не найден"""
+        """Test when the city is not found"""
         with patch('server.get_city_coordinates') as mock_coords:
             mock_coords.return_value = None
             
@@ -193,7 +193,7 @@ class TestRealWeatherData:
                 await get_real_weather_data("UnknownCity", 1)
             
             assert exc_info.value.error.code == INVALID_PARAMS
-            assert "не найден" in exc_info.value.error.message
+            assert "not found" in exc_info.value.error.message
 
 
 class TestMCPTools:
@@ -201,7 +201,7 @@ class TestMCPTools:
     
     @pytest.mark.asyncio
     async def test_get_today_weather_success(self):
-        """Тест успешного получения погоды на сегодня"""
+        """Test of successful retrieval of today's weather"""
         mock_weather_data = {
             'city': 'Moscow',
             'coordinates': {'latitude': 55.7558, 'longitude': 37.6176},
@@ -231,17 +231,17 @@ class TestMCPTools:
             
             assert "Moscow" in result
             assert "-5°C" in result
-            assert "пасмурно" in result
+            assert "cloudy" in result
             assert "Open-Meteo API" in result
     
     @pytest.mark.asyncio
     async def test_get_today_weather_empty_city(self):
-        """Тест с пустым названием города"""
+        """Empty city name test"""
         with pytest.raises(McpError) as exc_info:
             await get_today_weather("")
         
         assert exc_info.value.error.code == INVALID_PARAMS
-        assert "пустым" in exc_info.value.error.message
+        assert "empty" in exc_info.value.error.message
     
     @pytest.mark.asyncio
     async def test_get_weekly_forecast_success(self):
@@ -290,7 +290,7 @@ class TestMCPTools:
     
     @pytest.mark.asyncio
     async def test_get_weekly_forecast_whitespace_city(self):
-        """Тест с пробелами в названии города"""
+        """City name test with spaces"""
         with pytest.raises(McpError) as exc_info:
             await get_weekly_forecast("   ")
         
@@ -298,13 +298,13 @@ class TestMCPTools:
 
 
 class TestIntegration:
-    """Интеграционные тесты"""
+    """Integration tests"""
     
     @pytest.mark.asyncio
     async def test_full_weather_flow(self):
-        """Тест полного потока получения погоды"""
+        """Testing the full weather stream"""
         with patch('httpx.AsyncClient') as mock_client:
-            # Настраиваем моки для двух вызовов: геокодирование и погода
+            # Setting up mocks for two calls: geocoding and weather
             mock_responses = [
                 Mock(json=lambda: MOCK_GEOCODING_RESPONSE),
                 Mock(json=lambda: MOCK_WEATHER_RESPONSE)
@@ -317,7 +317,7 @@ class TestIntegration:
             
             result = await get_today_weather("Moscow")
             
-            # Проверяем что результат содержит ожидаемые данные
+            # We check that the result contains the expected data.
             assert "Moscow" in result
             assert "55.76" in result  # Координаты
             assert "37.62" in result
@@ -327,7 +327,7 @@ class TestIntegration:
     
     @pytest.mark.asyncio
     async def test_error_propagation(self):
-        """Тест распространения ошибок через всю цепочку"""
+        """Test of error propagation through the entire chain"""
         with patch('server.get_city_coordinates') as mock_coords:
             mock_coords.side_effect = Exception("Network error")
             
@@ -339,11 +339,11 @@ class TestIntegration:
 
 
 class TestEdgeCases:
-    """Тесты крайних случаев"""
+    """Edge case tests"""
     
     @pytest.mark.asyncio
     async def test_unicode_city_names(self):
-        """Тест с unicode названиями городов"""
+        """City Names Unicode Test"""
         with patch('httpx.AsyncClient') as mock_client:
             mock_response = Mock()
             mock_response.json.return_value = MOCK_GEOCODING_RESPONSE
@@ -360,7 +360,7 @@ class TestEdgeCases:
                 assert result == (55.7558, 37.6176)
     
     def test_weather_codes_coverage(self):
-        """Тест покрытия различных кодов погоды"""
+        """Test coverage of various weather codes"""
         # Тестируем основные категории кодов
         clear_codes = [0, 1]
         cloudy_codes = [2, 3]
@@ -372,11 +372,11 @@ class TestEdgeCases:
             description = weather_code_to_description(code)
             assert isinstance(description, str)
             assert len(description) > 0
-            assert "неизвестно" not in description
+            assert "unknown" not in description
         
         # Тестируем неизвестный код
         unknown_description = weather_code_to_description(9999)
-        assert "неизвестно" in unknown_description
+        assert "unknown" in unknown_description
 
 
 if __name__ == "__main__":

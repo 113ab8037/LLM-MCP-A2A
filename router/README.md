@@ -1,113 +1,113 @@
 # Router Agent
 
-Система маршрутизации запросов между AI-агентами с поддержкой динамического управления через REST API.
+A system for routing requests between AI agents with support for dynamic management via the REST API.
 
-## 🚀 Возможности
+## 🚀 Features
 
-- **Объединенный сервер**: A2A протокол и управление агентами на одном порту
-- **Три режима работы**: A2A сервер, FastAPI REST API, или объединенный режим
-- **Динамическое управление агентами**: добавление/удаление агентов без перезапуска
-- **Детальное логирование**: полное отслеживание запросов с emoji-маркерами
-- **Ограничение истории**: автоматическое управление контекстом диалога
-- **Контейнеризация**: готовые Docker-образы и docker-compose
-- **Современный стек**: Python 3.13, uv, FastAPI, Google ADK
+- **Unified server**: A2A protocol and agent management on a single port
+- **Three operating modes**: A2A server, FastAPI REST API, or combined mode
+- **Dynamic agent management**: add/remove agents without restarting
+- **Detailed logging**: full tracking of requests with emoji markers
+- **History limitation**: automatic dialog context management
+- **Containerization**: ready-to-use Docker images and docker-compose
+- **Modern stack**: Python 3.13, uv, FastAPI, Google ADK
 
-## 📋 Требования
+## 📋 Requirements
 
 - Python 3.13+
-- uv (рекомендуется) или pip
-- Docker и Docker Compose (для контейнерного запуска)
+- uv (recommended) or pip
+- Docker and Docker Compose (for containerized running)
 
-## 🛠 Установка
+## 🛠 Installation
 
-### Локальная установка
+### Local installation
 
 ```bash
-# Клонирование репозитория
+# Cloning a repository
 git clone <repository-url>
 cd router
 
-# Установка зависимостей через uv
+# Installing dependencies via uv
 uv sync
 
-# Или через pip
+# Or via pip
 pip install -r requirements.txt
 ```
 
 ### Docker установка
 
 ```bash
-# Сборка образа
+# Image assembly
 docker build -t router-agent .
 
-# Или использование docker-compose
+# Or using docker-compose
 docker-compose up --build
 ```
 
-## 🎯 Быстрый старт
+## 🎯 Quick Start
 
-### 1. Объединенный сервер (рекомендуется)
+### 1. Combined Server (recommended)
 
 ```bash
-# Простой запуск
+# Easy Start
 ./run.sh unified
 
-# С настройками
+# With settings
 ./run.sh unified --host 0.0.0.0 --port 10000 --remote-agents "http://agent1:10001"
 
-# Через Python
+# Via Python
 python start_server.py unified
 ```
 
-**Доступные эндпоинты:**
-- A2A протокол: http://localhost:10000/ (все стандартные пути)
-- Управление агентами: http://localhost:10000/mgm/agents
-- Список агентов: `GET /mgm/agents`
-- Добавить агента: `POST /mgm/agents`
-- Удалить агента: `DELETE /mgm/agents/{name}`
+**Available endpoints:**
+- A2A protocol: http://localhost:10000/ (all standard paths)
+- Agent management: http://localhost:10000/mgm/agents
+- Agent list: `GET /mgm/agents`
+- Add agent: `POST /mgm/agents`
+- Delete agent: `DELETE /mgm/agents/{name}`
 
-### 2. FastAPI сервер (legacy)
+### 2. FastAPI server (legacy)
 
 ```bash
-# С настройками
+# With settings
 ./run.sh fastapi --host 0.0.0.0 --port 8000 --reload
 
 # Через Python
 python start_server.py fastapi
 ```
 
-**Доступные эндпоинты:**
+**Available endpoints:**
 - API: http://localhost:8000
-- Документация: http://localhost:8000/docs
-- Управление агентами: http://localhost:8000/agents
+- Documentation: http://localhost:8000/docs
+- Agent management: http://localhost:8000/agents
 
-### 3. A2A сервер (legacy)
+### 3. A2A server (legacy)
 
 ```bash
-# Запуск с агентами
+# Starting with agents
 ./run.sh a2a --remote-agents "http://localhost:10001,http://localhost:10002"
 
-# Через Python
+# Via Python
 python start_server.py a2a --remote-agents "http://agent1:10001"
 ```
 
-### 4. Оба сервера одновременно (DEPRECATED)
+### 4. Both servers simultaneously (DEPRECATED)
 
 ```bash
 ./run.sh both
 ```
 
-## 🔧 Управление агентами
+## 🔧 Managing agents
 
-### Объединенный сервер (рекомендуется)
+### Combined server (recommended)
 
-#### Просмотр списка агентов
+#### Viewing the list of agents
 
 ```bash
 curl http://localhost:10000/mgm/agents
 ```
 
-#### Добавление агента
+#### Adding an agent
 
 ```bash
 curl -X POST http://localhost:10000/mgm/agents \
@@ -115,21 +115,21 @@ curl -X POST http://localhost:10000/mgm/agents \
   -d '{"address": "http://weather-service:10001"}'
 ```
 
-#### Удаление агента
+#### Removing the agent
 
 ```bash
 curl -X DELETE http://localhost:10000/mgm/agents/weather_agent
 ```
 
-### Legacy FastAPI сервер
+### Legacy FastAPI server
 
-#### Просмотр списка агентов
+#### View list of agents
 
 ```bash
 curl http://localhost:8000/agents
 ```
 
-**Ответ:**
+**Answer:**
 ```json
 [
   {
@@ -139,7 +139,7 @@ curl http://localhost:8000/agents
 ]
 ```
 
-#### Добавление агента
+#### Adding an agent
 
 ```bash
 curl -X POST http://localhost:8000/agents \
@@ -147,7 +147,7 @@ curl -X POST http://localhost:8000/agents \
   -d '{"address": "http://weather-service:10001"}'
 ```
 
-**Ответ:**
+**Answer:**
 ```json
 {
   "message": "Agent added",
@@ -155,13 +155,13 @@ curl -X POST http://localhost:8000/agents \
 }
 ```
 
-#### Удаление агента
+#### Removing an agent
 
 ```bash
 curl -X DELETE http://localhost:8000/agents/weather_agent
 ```
 
-**Ответ:**
+**Answer:**
 ```json
 {
   "message": "Agent removed",
@@ -169,9 +169,9 @@ curl -X DELETE http://localhost:8000/agents/weather_agent
 }
 ```
 
-## ⚙️ Конфигурация
+## ⚙️ Configuration
 
-### Переменные окружения
+### Environment variables
 
 Создайте файл `.env`:
 
@@ -196,7 +196,7 @@ LOG_LEVEL=INFO
 REMOTE_AGENT=http://localhost:10002,http://localhost:10003
 ```
 
-### Настройка через docker-compose
+### Configuration via docker-compose
 
 ```yaml
 environment:
@@ -209,7 +209,7 @@ environment:
 
 ### Dockerfile
 
-Проект использует многоэтапную сборку с uv для оптимизации размера образа:
+The project uses multi-stage UV assembly to optimize image size:
 
 ```dockerfile
 FROM ghcr.io/astral-sh/uv:python3.13-slim AS builder
@@ -259,20 +259,20 @@ docker-compose down
 2025-01-16 10:30:21 - INFO - 📚 History management - Total turns: 5, Keep turns: 3
 ```
 
-### Проверка статуса
+### Checking the status
 
 ```bash
-# Через скрипт
+# Via script
 ./run.sh status
 
-# Через API
+# Via API
 curl http://localhost:8000/agents
 
-# Через docker
+# Via Docker
 docker-compose ps
 ```
 
-## 🏗 Архитектура
+## 🏗 Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐
@@ -294,79 +294,79 @@ docker-compose ps
          └─────────────────┘
 ```
 
-### Компоненты
+### Components
 
-- **FastAPI Server**: REST API для управления агентами
-- **A2A Server**: Совместимость с A2A протоколом
-- **HostAgent**: Центральный маршрутизатор с общим реестром агентов
-- **RouterAgent**: Обработка запросов через Google ADK
-- **RemoteAgentConnection**: Клиенты для связи с удаленными агентами
+- **FastAPI Server**: REST API for agent management
+- **A2A Server**: Compatibility with the A2A protocol
+- **HostAgent**: Central router with a shared agent registry
+- **RouterAgent**: Request processing via Google ADK
+- **RemoteAgentConnection**: Clients for communicating with remote agents
 
-## 🔍 Отладка
+## 🔍 Debugging
 
-### Частые проблемы
+### Common Issues
 
-1. **Агент не найден**
+1. **Agent not found**
    ```
    ValueError: Agent weather_agent not found
    ```
-   - Проверьте список агентов: `curl http://localhost:8000/agents`
-   - Убедитесь, что агент добавлен через API
+   - Check the list of agents: `curl http://localhost:8000/agents`
+   - Make sure the agent was added via the API
 
-2. **Тайм-аут соединения**
-   ```
-   HTTP Error 503: Network communication error
-   ```
-   - Проверьте доступность удаленного агента
-   - Увеличьте тайм-аут в `remote_agent_connection.py`
+2. **Connection timeout**
+```
+HTTP Error 503: Network communication error
+```
+- Check the remote agent's availability
+- Increase the timeout in `remote_agent_connection.py`
 
-3. **Порт занят**
-   ```
-   OSError: [Errno 48] Address already in use
-   ```
-   - Проверьте: `lsof -i :8000`
-   - Измените порт: `--port 8001`
+3. **Port busy**
+```
+OSError: [Errno 48] Address already in use
+```
+- Check: `lsof -i :8000`
+- Change the port: `--port 8001`
 
-### Логи отладки
+### Debug logs
 
 ```bash
-# Детальные логи
+# Detailed logs
 export LOG_LEVEL=DEBUG
 ./run.sh fastapi
 
-# Логи конкретного контейнера
+# Container-specific logs
 docker-compose logs -f router-agent
 
-# Логи в реальном времени
+# Real-time logs
 tail -f server.log
 ```
 
-## 🧪 Тестирование
+## 🧪 Testing
 
-### Ручное тестирование
+### Manual Testing
 
 ```bash
-# Добавление тестового агента
+# Adding a Test Agent
 curl -X POST http://localhost:8000/agents \
   -H "Content-Type: application/json" \
   -d '{"address": "http://localhost:10001"}'
 
-# Отправка тестового запроса
+# Sending a test request
 curl -X POST http://localhost:10000/send-message \
   -H "Content-Type: application/json" \
   -d '{"message": "Привет, как дела?"}'
 ```
 
-### Автоматические тесты
+### Automated tests
 
 ```bash
-# Запуск тестов (если есть)
+# Run tests (if any)
 python -m pytest tests/
 
-# Проверка линтера
+# Check the linter
 flake8 *.py
 
-# Проверка типов
+# Type checking
 mypy *.py
 ```
 
@@ -375,7 +375,7 @@ mypy *.py
 ### FastAPI Endpoints
 
 #### GET /agents
-Получить список зарегистрированных агентов.
+Get a list of registered agents.
 
 **Ответ:**
 ```json
@@ -388,16 +388,15 @@ mypy *.py
 ```
 
 #### POST /agents
-Добавить нового агента.
-
-**Запрос:**
+Add a new agent.
+**Request:**
 ```json
 {
   "address": "http://agent-url:port"
 }
 ```
 
-**Ответ:**
+**Answer:**
 ```json
 {
   "message": "Agent added",
@@ -406,9 +405,9 @@ mypy *.py
 ```
 
 #### DELETE /agents/{agent_name}
-Удалить агента по имени.
+Remove agent by name.
 
-**Ответ:**
+**Answer:**
 ```json
 {
   "message": "Agent removed",
@@ -416,69 +415,69 @@ mypy *.py
 }
 ```
 
-## 🤝 Разработка
+## 🤝 Development
 
-### Структура проекта
+### Project Structure
 
 ```
 router/
-├── agent_executor.py      # Исполнитель агентов
-├── host_agent.py         # Центральный маршрутизатор
-├── router_agent.py       # Обработчик запросов
-├── remote_agent_connection.py  # Клиенты удаленных агентов
-├── fastapi_host_server.py # FastAPI сервер
-├── main.py              # A2A сервер
-├── start_server.py      # Унифицированный запуск
-├── run.sh              # Скрипт быстрого запуска
-├── Dockerfile          # Docker образ
-├── docker-compose.yml  # Оркестрация контейнеров
-├── pyproject.toml      # Конфигурация uv
-└── requirements.txt    # Зависимости pip
+├── agent_executor.py      # Agent executor
+├── host_agent.py         # Central router
+├── router_agent.py       # Request handler
+├── remote_agent_connection.py  # Remote agent clients
+├── fastapi_host_server.py # FastAPI server
+├── main.py              # A2A server
+├── start_server.py      # Unified launch
+├── run.sh              # Quickstart script
+├── Dockerfile          # Docker image
+├── docker-compose.yml  # Container orchestration
+├── pyproject.toml      # UV configuration
+└── requirements.txt    # pip dependencies
 ```
 
-### Добавление новых функций
+### Adding new features
 
-1. Создайте ветку: `git checkout -b feature/new-feature`
-2. Внесите изменения
-3. Добавьте тесты
-4. Обновите документацию
-5. Создайте Pull Request
+1. Create a branch: `git checkout -b feature/new-feature`
+2. Make changes
+3. Add tests
+4. Update documentation
+5. Create a pull request
 
-## 📄 Лицензия
+## 📄 License
 
-MIT License - см. файл LICENSE для деталей.
+MIT License - see the LICENSE file for details.
 
-## 🆘 Поддержка
+## 🆘 Support
 
-- Создайте Issue в GitHub для багов
-- Обратитесь к разработчикам для вопросов
-- Проверьте логи с emoji-маркерами для диагностики
+- Create a GitHub Issue for bugs
+- Contact the developers with questions
+- Check the logs with emoji markers for diagnostics
 
-## Переменные окружения
+## Environment Variables
 
 ### REMOTE_AGENT
-Вы можете указать адреса удаленных агентов через переменную окружения `REMOTE_AGENT`. Адреса должны быть разделены запятыми:
+You can specify remote agent addresses using the `REMOTE_AGENT` environment variable. Addresses must be separated by commas:
 
 ```bash
 export REMOTE_AGENT="http://localhost:10002,http://localhost:10003"
 ```
 
-Или в файле `.env`:
+Or in a file `.env`:
 ```
 REMOTE_AGENT=http://localhost:10002,http://localhost:10003
 ```
 
-Эта переменная будет использоваться автоматически, если не указаны агенты через параметры командной строки `--remote-agents` в командах `a2a` и `unified`.
+This variable will be used automatically if agents are not specified via the `--remote-agents` command-line options in the `a2a` and `unified` commands.
 
-### Пример использования
+### Usage example
 
 ```bash
-# Установить переменную окружения
+# Set environment variable
 export REMOTE_AGENT="http://localhost:10002,http://localhost:10003"
 
-# Запустить unified сервер (автоматически загрузит агентов из переменной окружения)
+# Start the unified server (will automatically load agents from the environment variable)
 python -m app.start_server unified --host 0.0.0.0 --port 10000
 
-# Или запустить A2A сервер
+# Or start an A2A server
 python -m app.start_server a2a --host localhost --port 10000
 ```

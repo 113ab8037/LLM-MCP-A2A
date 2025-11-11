@@ -12,7 +12,7 @@ from mcp.shared.exceptions import McpError
 from mcp.types import ErrorData, INTERNAL_ERROR, INVALID_PARAMS
 from mcp.server.sse import SseServerTransport
 
-# Создаем экземпляр MCP сервера с идентификатором "weather"
+# Create an instance of the MCP server with the identifier "weather"
 mcp = FastMCP("weather")
 
 
@@ -20,13 +20,13 @@ async def get_city_coordinates(
     city_name: str
 ) -> Optional[Tuple[float, float]]:
     """
-    Получает координаты города через Open-Meteo Geocoding API
-    
+    Gets city coordinates via the Open-Meteo Geocoding API.
+
     Args:
-        city_name: Название города
-        
+        city_name: City name
+
     Returns:
-        Tuple[latitude, longitude] или None если не найден
+        Tuple[latitude, longitude] or None if not found
     """
     try:
         geocoding_url = "https://geocoding-api.open-meteo.com/v1/search"
@@ -37,7 +37,7 @@ async def get_city_coordinates(
             "format": "json"
         }
         
-        # Создаем новый HTTP клиент для каждого запроса
+        # Create a new HTTP client for each request
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.get(geocoding_url, params=params)
             response.raise_for_status()
@@ -51,7 +51,7 @@ async def get_city_coordinates(
             return result["latitude"], result["longitude"]
         
     except Exception as e:
-        print(f"Ошибка координат для города {city_name}: {e}")
+        print(f"Coordinate error for the city {city_name}: {e}")
         return None
 
 
@@ -61,15 +61,15 @@ async def get_weather_data(
     days: int = 1
 ) -> Dict:
     """
-    Получает данные о погоде через Open-Meteo API
-    
+    Retrieves weather data via the Open-Meteo API
+
     Args:
-        latitude: Широта
-        longitude: Долгота
-        days: Количество дней прогноза
-        
+        latitude: Latitude
+        longitude: Longitude
+        days: Number of forecast days
+
     Returns:
-        Словарь с данными о погоде
+        Dictionary with weather data
     """
     weather_url = "https://api.open-meteo.com/v1/forecast"
     
@@ -110,58 +110,58 @@ async def get_weather_data(
 
 def weather_code_to_description(code: int) -> str:
     """
-    Конвертирует код погоды WMO в текстовое описание
-    
+    Converts a WMO weather code to a text description.
+
     Args:
-        code: WMO код погоды
-        
+        code: WMO weather code
+
     Returns:
-        Текстовое описание погоды на русском языке
+        Text description of the weather in Russian
     """
     weather_codes = {
-        0: "ясно",
-        1: "преимущественно ясно",
-        2: "переменная облачность",
-        3: "пасмурно",
-        45: "туман",
-        48: "изморозь",
-        51: "легкая морось",
-        53: "умеренная морось",
-        55: "интенсивная морось",
-        56: "легкая ледяная морось",
-        57: "интенсивная ледяная морось",
-        61: "легкий дождь",
-        63: "умеренный дождь",
-        65: "сильный дождь",
-        66: "легкий ледяной дождь",
-        67: "сильный ледяной дождь",
-        71: "легкий снег",
-        73: "умеренный снег",
-        75: "сильный снег",
-        77: "снежная крупа",
-        80: "легкие ливни",
-        81: "умеренные ливни",
-        82: "сильные ливни",
-        85: "легкие снежные ливни",
-        86: "сильные снежные ливни",
-        95: "гроза",
-        96: "гроза с легким градом",
-        99: "гроза с сильным градом"
+        0: "clear",
+        1: "mostly clear",
+        2: "partly cloudy",
+        3: "overcast",
+        45: "fog",
+        48: "drizzle",
+        51: "light drizzle",
+        53: "moderate drizzle",
+        55: "heavy drizzle",
+        56: "light freezing drizzle",
+        57: "heavy freezing drizzle",
+        61: "light rain",
+        63: "moderate rain",
+        65: "heavy rain",
+        66: "light freezing rain",
+        67: "heavy freezing rain",
+        71: "light snow",
+        73: "moderate snow",
+        75: "heavy snow",
+        77: "snow pellets",
+        80: "light showers",
+        81: "moderate showers",
+        82: "heavy showers",
+        85: "light snow showers",
+        86: "heavy snow showers",
+        95: "thunderstorm",
+        96: "thunderstorm with light hail",
+        99: "thunderstorm with large hail"
     }
     
-    return weather_codes.get(code, f"неизвестно (код {code})")
+    return weather_codes.get(code, f"unknown (code {code})")
 
 
 async def get_real_weather_data(city_name: str, days: int = 1) -> Dict:
     """
-    Получает реальные данные о погоде для указанного города
-    
+    Gets real weather data for the specified city.
+
     Args:
-        city_name: Название города
-        days: Количество дней прогноза
-        
+        city_name: City name
+        days: Number of forecast days
+
     Returns:
-        Словарь с данными о погоде
+        Dictionary with weather data
     """
     # Получаем координаты города
     coordinates = await get_city_coordinates(city_name)
@@ -222,24 +222,21 @@ async def get_real_weather_data(city_name: str, days: int = 1) -> Dict:
 @mcp.tool()
 async def get_today_weather(city: str) -> str:
     """
-    Получает актуальную погоду на сегодня для любого города мира.
-    Данные предоставляются Open-Meteo API.
-    
+    Gets real weather data for the specified city.
+
     Args:
-        city: Название города (на любом языке)
-    
-    Usage:
-        get_today_weather("Москва")
-        get_today_weather("Paris")
-        get_today_weather("New York")
-        get_today_weather("Токио")
+        city_name: City name
+        days: Number of forecast days
+
+    Returns:
+        Dictionary with weather data
     """
     try:
         if not city or not city.strip():
             raise McpError(
                 ErrorData(
                     code=INVALID_PARAMS,
-                    message="Название города не может быть пустым"
+                    message="The city name cannot be empty"
                 )
             )
         
@@ -248,21 +245,21 @@ async def get_today_weather(city: str) -> str:
         today_forecast = weather_data["forecast"][0]
         coords = weather_data["coordinates"]
         
-        result = f"""🌤️ Погода сегодня в городе {weather_data['city']}
+        result = f"""🌤️ Weather in the city today {weather_data['city']}
 
-📍 Координаты: {coords['latitude']:.2f}, {coords['longitude']:.2f}
-🕒 Время: {weather_data['current_time']}
+📍 Coordinates: {coords['latitude']:.2f}, {coords['longitude']:.2f}
+🕒 Time: {weather_data['current_time']}
 
-🌡️ Сейчас: {current['temperature']}°C
-☁️ Условия: {current['condition']}
-💧 Влажность: {current['humidity']}%
-💨 Скорость ветра: {current['wind_speed']} м/с
-📊 Давление: {current['pressure']} гПа
+🌡️ Now: {current['temperature']}°C
+☁️ Conditions: {current['condition']}
+💧 Humidity: {current['humidity']}%
+💨 Wind speed: {current['wind_speed']} м/с
+📊 Pressure: {current['pressure']} гПа
 
-📅 Прогноз на сегодня:
-🌅 Максимум: {today_forecast['day_temp']}°C
-🌙 Минимум: {today_forecast['night_temp']}°C
-🌧️ Вероятность осадков: {today_forecast['precipitation_chance']}%
+📅 Forecast for today:
+🌅 Maximum: {today_forecast['day_temp']}°C
+🌙 Minimum: {today_forecast['night_temp']}°C
+🌧️ Chance of precipitation: {today_forecast['precipitation_chance']}%
 
 🔗 Данные предоставлены Open-Meteo API"""
         
@@ -274,7 +271,7 @@ async def get_today_weather(city: str) -> str:
         raise McpError(
             ErrorData(
                 code=INTERNAL_ERROR,
-                message=f"Ошибка при получении данных о погоде: {str(e)}"
+                message=f"Error retrieving weather data: {str(e)}"
             )
         ) from e
 
@@ -282,24 +279,24 @@ async def get_today_weather(city: str) -> str:
 @mcp.tool()
 async def get_weekly_forecast(city: str) -> str:
     """
-    Получает актуальный прогноз погоды на неделю для любого города мира.
-    Данные предоставляются Open-Meteo API.
-    
+    Gets the current weekly weather forecast for any city in the world.
+    Data provided by the Open-Meteo API.
+
     Args:
-        city: Название города (на любом языке)
-    
+        city: City name (in any language)
+
     Usage:
-        get_weekly_forecast("Лондон")
-        get_weekly_forecast("Tokyo")
-        get_weekly_forecast("Sydney")
-        get_weekly_forecast("Берлин")
+            get_weekly_forecast("London")
+            get_weekly_forecast("Tokyo")
+            get_weekly_forecast("Sydney")
+            get_weekly_forecast("Berlin")
     """
     try:
         if not city or not city.strip():
             raise McpError(
                 ErrorData(
                     code=INVALID_PARAMS,
-                    message="Название города не может быть пустым"
+                    message="The city name cannot be empty"
                 )
             )
         
@@ -308,32 +305,32 @@ async def get_weekly_forecast(city: str) -> str:
         
         city_name = weather_data['city']
         lat, lon = coords['latitude'], coords['longitude']
-        result = f"""📅 Прогноз погоды на неделю для города {city_name}
+        result = f"""📅 Weekly weather forecast for the city {city_name}
 
-📍 Координаты: {lat:.2f}, {lon:.2f}
-🕒 Обновлено: {weather_data['current_time']}
+📍 Coordinates: {lat:.2f}, {lon:.2f}
+🕒 Updated: {weather_data['current_time']}
 
-📊 Недельный прогноз:
+📊 Weekly forecast:
 """
         
         for day in weather_data['forecast']:
             weekday_ru = {
-                'Monday': 'Понедельник',
-                'Tuesday': 'Вторник', 
-                'Wednesday': 'Среда',
-                'Thursday': 'Четверг',
-                'Friday': 'Пятница',
-                'Saturday': 'Суббота',
-                'Sunday': 'Воскресенье'
+                'Monday': 'Monday',
+                'Tuesday': 'Tuesday', 
+                'Wednesday': 'Wednesday',
+                'Thursday': 'Thursday',
+                'Friday': 'Friday',
+                'Saturday': 'Saturday',
+                'Sunday': 'Sunday'
             }.get(day['weekday'], day['weekday'])
             
             result += f"""
 📆 {day['date']} ({weekday_ru})
    🌅 Макс: {day['day_temp']}°C | 🌙 Мин: {day['night_temp']}°C
    ☁️ {day['condition']} | 💨 {day['wind_speed']} м/с
-   🌧️ Вероятность осадков: {day['precipitation_chance']}%"""
+   🌧️ Chance of precipitation: {day['precipitation_chance']}%"""
         
-        result += "\n\n🔗 Данные предоставлены Open-Meteo API"
+        result += "\n\n🔗 Data provided by Open-Meteo API"
         
         return result
         
@@ -343,7 +340,7 @@ async def get_weekly_forecast(city: str) -> str:
         raise McpError(
             ErrorData(
                 code=INTERNAL_ERROR,
-                message=f"Ошибка при получении прогноза погоды: {str(e)}"
+                message=f"Error retrieving weather forecast: {str(e)}"
             )
         ) from e
 
@@ -353,7 +350,7 @@ sse = SseServerTransport("/messages/")
 
 
 async def handle_sse(request: Request):
-    """Обработчик SSE соединений"""
+    """SSE connection handler"""
     _server = mcp._mcp_server
     async with sse.connect_sse(
         request.scope,
@@ -377,14 +374,14 @@ app = Starlette(
 )
 
 if __name__ == "__main__":
-    print("🌤️ Запуск MCP сервера погоды с Open-Meteo API...")
-    print("📡 Сервер будет доступен по адресу: http://localhost:8001")
+    print("🌤️ Running an MCP weather server with the Open-Meteo API...")
+    print("📡 The server will be available at: http://localhost:8001")
     print("🔗 SSE endpoint: http://localhost:8001/sse")
     print("📧 Messages endpoint: http://localhost:8001/messages/")
-    print("🛠️ Доступные инструменты:")
-    print("   - get_today_weather(city) - актуальная погода для любого города")
-    print("   - get_weekly_forecast(city) - прогноз на неделю")
-    print("🌍 Данные предоставляются Open-Meteo API (без API ключа)")
-    print("🆓 Поддерживаются города со всего мира!")
+    print("🛠️ Available tools:")
+    print("   - get_today_weather(city) - current weather for any city")
+    print("   - get_weekly_forecast(city) - forecast for the week")
+    print("🌍 Data is provided by the Open-Meteo API (without an API key)")
+    print("🆓 Cities from all over the world are supported!")
     
     uvicorn.run(app, host="0.0.0.0", port=8001) 

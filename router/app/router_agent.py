@@ -90,7 +90,7 @@ class RouterAgent(AgentWithTaskManager):
         ).create_agent()
 
     async def stream(self, query, session_id) -> AsyncIterable[dict[str, Any]]:
-        # Логируем начало обработки в RouterAgent
+        # Logging the start of processing in RouterAgent
         logging.info("="*40)
         logging.info("🤖 ROUTER AGENT: Starting stream processing")
         logging.info(f"📝 Query: {query}")
@@ -120,7 +120,7 @@ class RouterAgent(AgentWithTaskManager):
             if session.state:
                 logging.info(f"🗂️ Session state: {session.state}")
             
-        # Логируем содержимое сообщения
+        # Logging the message content
         logging.info(f"💬 Content parts: {len(content.parts) if content.parts else 0}")
         for i, part in enumerate(content.parts or []):
             if hasattr(part, 'text') and part.text:

@@ -1,132 +1,132 @@
 # AI Agent Template
 
-Современный шаблон для создания ИИ агентов на базе Google ADK (Agent Development Kit) с поддержкой MCP (Model Context Protocol) инструментов и Phoenix мониторинга.
+A modern template for creating AI agents based on Google ADK (Agent Development Kit) with support for MCP (Model Context Protocol) tools and Phoenix monitoring.
 
-## 🚀 Особенности
+## 🚀 Peculiarities
 
-- **Google ADK Integration** - Использование передового SDK для разработки агентов
-- **MCP Tools Support** - Интеграция с Model Context Protocol для расширяемых инструментов
-- **LiteLLM** - Поддержка различных LLM моделей через единый интерфейс
-- **Phoenix Monitoring** - Опциональный мониторинг и трейсинг выполнения
-- **Docker Ready** - Полная контейнеризация с автоматической настройкой
-- **A2A Protocol** - Agent-to-Agent коммуникация
-- **CORS Support** - Готов для веб-интеграции
-- **Flexible Configuration** - Настройка через переменные окружения
+- **Google ADK Integration** - Leverages the industry-leading SDK for agent development
+- **MCP Tools Support** - Integration with the Model Context Protocol for extensible tools
+- **LiteLLM** - Support for various LLM models through a single interface
+- **Phoenix Monitoring** - Optional monitoring and execution tracing
+- **Docker Ready** - Full containerization with automatic configuration
+- **A2A Protocol** - Agent-to-Agent communication
+- **CORS Support** - Ready for web integration
+- **Flexible Configuration** - Configuration via environment variables
 
-## 📁 Структура проекта
+## 📁 Project structure
 
 ```
 ai-agent-template/
-├── app/                     # Основной код приложения
-│   ├── __main__.py         # Точка входа с Click CLI
-│   ├── agent.py            # Класс AgentEvolution
-│   └── agent_executor.py   # Исполнитель агента
-├── docker-compose.yml      # Docker конфигурация
-├── docker-compose.phoenix.yml  # Конфигурация с Phoenix
-├── Dockerfile              # Образ контейнера
-├── Makefile               # Автоматизация команд
-├── scripts/               # Вспомогательные скрипты
-│   └── docker-setup.sh    # Автоматическая настройка
-├── nginx/                 # Nginx конфигурация
-├── pyproject.toml         # Конфигурация проекта и зависимости
+├── app/                     # Main application code
+│   ├── __main__.py         # Entry point with Click CLI
+│   ├── agent.py            # AgentEvolution class
+│   └── agent_executor.py   # Agent executor
+├── docker-compose.yml      # Docker configuration
+├── docker-compose.phoenix.yml  # Phoenix configuration
+├── Dockerfile              # Container image
+├── Makefile               # Command automation
+├── scripts/               # Helper scripts
+│   └── docker-setup.sh    # Automatic setup
+├── nginx/                 # Nginx configuration
+├── pyproject.toml         # Project configuration and dependencies
 └── litellm-1.72.3-py3-none-any.whl  # LiteLLM wheel
 ```
 
-## 🛠 Установка
+## 🛠 Installation
 
-### Быстрый старт с Docker (рекомендуется)
+### Getting Started with Docker (Recommended)
 
-#### Оптимизированная сборка для мгновенного старта
+#### Optimized build for instant start
 
-Образ настроен для максимально быстрого запуска без синхронизации пакетов:
+The image is configured to start as quickly as possible without package synchronization:
 
 ```bash
-# Сборка оптимизированного образа
+# Building an optimized image
 docker-compose build
 
-# Мгновенный запуск агента (< 1 секунды)
+# Instant agent launch (< 1 second)
 docker-compose up -d
 ```
 
-#### Ключевые оптимизации:
+#### Key optimizations:
 
-1. **Pre-installed dependencies** - все зависимости устанавливаются на этапе сборки
-2. **Frozen lockfile** - используется `uv sync --frozen` для точного воспроизведения окружения
-3. **Optimized layers** - правильный порядок COPY команд для максимального кеширования Docker слоев
-4. **Direct Python execution** - запуск через `python -m app` вместо `uv run`
+1. **Pre-installed dependencies** - all dependencies are installed during the build process
+2. **Frozen lockfile** - use `uv sync --frozen` to accurately replicate the environment
+3. **Optimized layers** - correct order of COPY commands for maximum caching of Docker layers
+4. **Direct Python execution** - run via `python -m app` instead of `uv run`
 
-### Использование Makefile
+### Using Makefile
 
 ```bash
-# Просмотр всех доступных команд
+# View all available commands
 make help
 
-# Запуск основных сервисов
+# Launching core services
 make up
 
-# Запуск с Phoenix мониторингом
+# Running with Phoenix monitoring
 make phoenix
 
-# Режим разработки
+# Development mode
 make dev
 
-# Просмотр логов
+# View logs
 make logs
 
-# Остановка всех сервисов
+# Stop all services
 make down
 ```
 
-### Ручная установка
+### Manual installation
 
 ```bash
-# Установка зависимостей (требуется uv)
+# Installing dependencies (requires uv)
 uv sync
 
-# Создание файла окружения
+# Creating an environment file
 cp .env.example .env
 
-# Настройка переменных окружения (см. раздел ниже)
+# Setting environment variables (see section below)
 nano .env
 
-# Запуск агента
+# Launching the agent
 uv run .
 ```
 
-## ⚙️ Конфигурация
+## ⚙️ Configuration
 
-### Основные переменные окружения
+### Basic environment variables
 
 ```bash
-# Основные настройки агента
+# Basic agent settings
 AGENT_NAME=ai-agent-template
 AGENT_DESCRIPTION=AI Agent на базе Google ADK и MCP tools
 AGENT_VERSION=0.1.0
 
-# Конфигурация модели
+# Configuration models
 MODEL_NAME=your-model-name
 MODEL_API_BASE=https://your-api-endpoint/v1
 
 # MCP Tools
 MCP_URL=http://localhost:8001/sse
 
-# Серверные настройки
+# Server settings
 HOST=0.0.0.0
 PORT=10002
 
-# Phoenix мониторинг (опционально)
+# Phoenix monitoring (optional)
 ENABLE_PHOENIX=false
 PHOENIX_PROJECT_NAME=ai-agent-template
 PHOENIX_ENDPOINT=http://localhost:6006/v1/traces
 
-# Системный промпт
-AGENT_SYSTEM_PROMPT=Вы - современный ИИ агент с расширенными возможностями. Используйте доступные инструменты для эффективного выполнения задач пользователя.
+# System prompt
+AGENT_SYSTEM_PROMPT=You are a modern AI agent with advanced capabilities. Use the available tools to effectively complete user tasks.
 
-# Сообщение при обработке
-PROCESSING_MESSAGE=🤖 Обрабатываю запрос...
+# Message during processing
+PROCESSING_MESSAGE=🤖 Processing your request...
 ```
 
-### Пример минимальной конфигурации
+### Example of minimal configuration
 
 ```bash
 AGENT_NAME=my-ai-agent
@@ -135,169 +135,169 @@ MODEL_API_BASE=https://api.openai.com/v1
 MCP_URL=http://localhost:8001/sse
 ```
 
-## 🚀 Использование
+## 🚀 Usage
 
-### Через Docker
+### Via Docker
 
 ```bash
-# Запуск основных сервисов
+# Launching core services
 make up
 
-# Агент будет доступен на http://localhost:10002
+# The agent will be available on http://localhost:10002
 ```
 
-### Режим разработки
+### Development Mode
 
 ```bash
-# Запуск в режиме разработки с live reload
+# Run in development mode with live reload
 make dev
 
-# Запуск с Phoenix мониторингом для отладки
+# Run with Phoenix monitoring for debugging
 make dev-phoenix
 ```
 
-### Проверка состояния
+### Checking Status
 
 ```bash
-# Статус всех сервисов
+# Status of all services
 make status
 
-# Проверка здоровья
+# Health Check
 make health
 
-# Просмотр логов
+# Viewing Logs
 make logs
 ```
 
-## 🔧 Архитектура
+## 🔧 Architecture
 
-### Основные компоненты
+### Main Components
 
-- **AgentEvolution** - Главный класс агента с LLM интеграцией
-- **EvolutionAgentExecutor** - Исполнитель запросов агента
-- **A2AStarletteApplication** - HTTP сервер на базе Starlette
-- **MCPToolset** - Набор MCP инструментов
-- **LiteLLM** - Абстракция для работы с различными LLM
+- **AgentEvolution** - Main agent class with LLM integration
+- **EvolutionAgentExecutor** - Agent request executor
+- **A2AStarletteApplication** - Starlette-based HTTP server
+- **MCPToolset** - MCP toolkit
+- **LiteLLM** - Abstraction for working with various LLMs
 
-### Поддерживаемые форматы
+### Supported Formats
 
-- **Входные данные**: `text`, `text/plain`
-- **Выходные данные**: `text`, `text/plain`
-- **Протоколы**: A2A (Agent-to-Agent), HTTP REST, SSE (Server-Sent Events)
+- **Input Data**: `text`, `text/plain`
+- **Output Data**: `text`, `text/plain`
+- **Protocols**: A2A (Agent-to-Agent), HTTP REST, SSE (Server-Sent Events)
 
-## 📊 Мониторинг
+## 📊 Monitoring
 
 ### Phoenix Tracing
 
-Для включения Phoenix мониторинга:
+To enable Phoenix monitoring:
 
 ```bash
-# Установить переменную окружения
+# Set the environment variable
 ENABLE_PHOENIX=true
 
-# Запустить с Phoenix
+# Run with Phoenix
 make phoenix
 
-# Phoenix Dashboard будет доступен на http://localhost:6006
+# Phoenix Dashboard will be available at http://localhost:6006
 ```
 
-### Логирование
+### Logging
 
-Логи сохраняются в:
-- Стандартный вывод (Docker logs)
-- `agent_monitoring.log` (при простом мониторинге)
+Logs are saved to:
+- Standard output (Docker logs)
+- `agent_monitoring.log` (for simple monitoring)
 
-## 🧪 Тестирование
+## 🧪 Testing
 
 ```bash
-# Запуск тестов
+# Running tests
 make test
 
-# Тестирование MCP трейсинга
+# Testing MCP tracing
 make test-mcp
 ```
 
-## 🛠 Разработка
+## 🛠 Development
 
-### Локальная разработка
+### Local Development
 
 ```bash
-# Установка зависимостей
+# Installing Dependencies
 uv sync
 
-# Создание .env файла
+# Creating a .env file
 make env
 
-# Запуск в режиме разработки
+# Running in Development Mode
 uv run . --host localhost --port 10002
 ```
 
-### Добавление новых инструментов
+### Adding New Tools
 
-1. Настройте MCP сервер с нужными инструментами
-2. Обновите `MCP_URL` в конфигурации
-3. Инструменты автоматически подключатся через MCPToolset
+1. Configure the MCP server with the required tools
+2. Update `MCP_URL` in the configuration
+3. The tools will be automatically connected via MCPToolset
 
-### Кастомизация агента
+### Customizing the Agent
 
-Основная логика агента находится в `app/agent.py`. Вы можете:
-- Изменить системный промпт
-- Добавить дополнительные инструменты
-- Настроить модель LLM
-- Изменить логику обработки запросов
+The main agent logic is located in `app/agent.py`. You can:
+- Change the system prompt
+- Add additional tools
+- Configure the LLM model
+- Change the request processing logic
 
-## 🐳 Docker команды
+## 🐳 Docker teams
 
 ```bash
-# Основные команды
-make build          # Сборка образов
-make up            # Запуск сервисов
-make down          # Остановка сервисов
-make restart       # Перезапуск
-make logs          # Просмотр логов
+# Basic commands
+make build          # Build images
+make up            # Start services
+make down          # Stop services
+make restart       # Restart
+make logs          # View logs
 
-# Phoenix мониторинг
-make phoenix       # Запуск с мониторингом
-make phoenix-down  # Остановка Phoenix
+# Phoenix monitoring
+make phoenix       # Start with monitoring
+make phoenix-down  # Stop Phoenix
 
 # Утилиты
-make shell         # Вход в контейнер агента
-make clean         # Очистка Docker ресурсов
-make backup        # Резервное копирование данных
+make shell         # Log into the agent container
+make clean         # Clean up Docker resources
+make backup        # Back up data
 ```
 
 ## 🌐 API Endpoints
 
-- `GET /` - Информация об агенте (Agent Card)
-- `POST /tasks` - Создание новой задачи
-- `GET /tasks/{task_id}` - Получение статуса задачи
-- `GET /tasks/{task_id}/stream` - SSE поток выполнения задачи
+- `GET /` - Agent Card information
+- `POST /tasks` - Create a new task
+- `GET /tasks/{task_id}` - Get task status
+- `GET /tasks/{task_id}/stream` - SSE task execution stream
 
 ## 📋 Требования
 
 - **Python**: 3.12+
-- **Docker**: Для контейнеризации
-- **uv**: Для управления зависимостями
-- **MCP Server**: Для инструментов (опционально)
+- **Docker**: For containerization
+- **uv**: For dependency management
+- **MCP Server**: For tools (optional)
 
-## 🤝 Участие в разработке
+## 🤝 Contribute to Development
 
-1. Форкните репозиторий
-2. Создайте ветку для функции (`git checkout -b feature/AmazingFeature`)
-3. Зафиксируйте изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Отправьте в ветку (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
+1. Fork the repository
+2. Create a branch for the feature (`git checkout -b feature/AmazingFeature`)
+3. Commit the changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Лицензия
+## 📄 License
 
-Этот проект распространяется под лицензией MIT. См. файл `LICENSE` для подробностей.
+This project is distributed under the MIT license. See the `LICENSE` file for details.
 
-## 🆘 Поддержка
+## 🆘 Support
 
-- Создайте Issue для сообщения о багах
-- Посмотрите документацию Google ADK
-- Проверьте статус сервисов через `make status`
-- Просмотрите логи через `make logs`
+- Create an Issue to report bugs
+- See the Google ADK documentation
+- Check the service status with `make status`
+- View logs with `make logs`
 
 ## 🔗 Полезные ссылки
 
@@ -306,70 +306,70 @@ make backup        # Резервное копирование данных
 - [LiteLLM Documentation](https://docs.litellm.ai/)
 - [Phoenix Tracing](https://phoenix.arize.com/)
 
-## 🛠 Технические детали
+## 🛠 Technical details
 
-### Dockerfile оптимизации:
+### Dockerfile optimizations:
 
 ```dockerfile
-# Устанавливаем ВСЕ зависимости на этапе сборки
+# Install ALL dependencies during the build process
 RUN uv sync --frozen --no-dev && \
     uv add ./litellm-1.72.3-py3-none-any.whl
 
-# Копируем код ПОСЛЕ установки зависимостей
+# Copy the code AFTER installing the dependencies
 COPY app ./app
 
-# Прямой запуск без uv run
+# Direct launch without UV run
 CMD ["python", "-m", app"]
 ```
 
-### Исправленные проблемы:
+### Fixed issues:
 
-✅ **Queue is closed** - улучшена логика обработки очереди событий  
-✅ **RuntimeWarning: coroutine 'wait_for' was never awaited** - исправлено использование asyncio.timeout  
-✅ **No final response from agent** - добавлена проверка контента перед завершением задач  
-✅ **Import errors** - исправлены относительные импорты в модулях  
+✅ **Queue is closed** - Improved event queue processing logic
+✅ **RuntimeWarning: coroutine 'wait_for' was never awaited** - Fixed asyncio.timeout usage
+✅ **No final response from agent** - Added content validation before task completion
+✅ **Import errors** - Fixed relative imports in modules
 
-### Время запуска:
+### Startup time:
 
-- **До оптимизации**: 30-60 секунд (с синхронизацией пакетов)
-- **После оптимизации**: < 1 секунды (готовый образ)
+- **Before optimization**: 30-60 seconds (with package synchronization)
+- **After optimization**: < 1 second (built image)
 
-## 📦 Использование
+## 📦 Usage
 
-### Запуск агента:
+### Starting the agent:
 
 ```bash
-# Запуск
+# Running
 docker-compose up -d
 
-# Просмотр логов
+# Viewing logs
 docker-compose logs -f
 
-# Остановка
+# Stopping
 docker-compose down
 ```
 
-### Проверка работы:
+### Checking operation:
 
 ```bash
-# Проверка статуса
+# Checking status
 curl http://localhost:10002/health
 
-# Просмотр логов запуска
+# Viewing startup logs
 docker logs evolution-agent
 ```
 
-## 🐛 Отладка
+## 🐛 Debugging
 
-При проблемах с запуском:
+If you have problems starting:
 
 ```bash
-# Проверка образа
+# Checking the image
 docker run --rm -it --entrypoint /bin/bash ai-agent-template-evolution-agent
 
-# Тест импортов
+# Testing imports
 docker run --rm ai-agent-template-evolution-agent python -c "from app import AgentEvolution; print('✅ OK')"
 
-# Просмотр детальных логов
+# Viewing detailed logs
 docker-compose logs evolution-agent --details
 ``` 

@@ -1,7 +1,7 @@
 [project]
 name = "weather-mcp-server"
 version = "0.1.0"
-description = "MCP сервер для получения реальных данных о погоде через Open-Meteo API"
+description = "MCP server for receiving real weather data via the Open-Meteo API"
 authors = [
     {name = "Your Name", email = "your.email@example.com"},
 ]
